@@ -1,31 +1,31 @@
 {
-  "name": "@taitems/jquery-gantt",
-  "version": "1.1.2",
-  "description": "jQuery Gantt Chart is a simple chart that implements gantt functionality as a jQuery component.",
+  "name": "@uzbeki/jquery-gantt-chart",
+  "version": "2024.3.25",
+  "description": "Simple Gantt Chart implemented with modernJS and jQuery. Previously known as jQuery.Gantt.",
   "main": "index.js",
+  "engines": {
+    "node": ">= 10.0.0"
+  },
   "directories": {
     "test": "tests"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/taitems/jQuery.Gantt.git"
-  },
+  "repository": "https://github.com/uzbeki/jquery-gantt-chart.git",
   "keywords": [
     "Gantt",
+    "Gantt Chart",
+    "Javascript Gantt Chart",
     "jQuery",
     "ecosystem:jquery",
     "jquery-plugin"
   ],
-  "author": "Tait Brown <taitbrown@gmail.com>",
-  "contributors": [
-    "Usman (https://github.com/usmonster)"
-  ],
+  "author": "Bekhruz Otaev <behruzbekotayev@gmail.com> (https://bekhruz.com)",
+  "contributors": [],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/taitems/jQuery.Gantt/issues"
+    "url": "https://github.com/uzbeki/jquery-gantt-chart/issues"
   },
-  "homepage": "https://github.com/taitems/jQuery.Gantt#readme"
+  "homepage": "https://github.com/uzbeki/jquery-gantt-chart#readme"
 }
