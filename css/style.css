@@ -424,6 +424,7 @@
     overflow: hidden;
     transition: all .6s ease;
     font-size: 0.75rem;
+    height: -webkit-fill-available;
 }
 
 .circle {
