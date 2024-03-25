@@ -225,10 +225,11 @@
                       <span class="fn-label ${entry.cssClass || ""}">${entry.name || ""}</span>
                     </div>
                     ${
-                      entry.desc &&
-                      `<div class="row desc row${i}" id="RowdId_${i}" ${dataId}>
+                      entry.desc
+                        ? `<div class="row desc row${i}" id="RowdId_${i}" ${dataId}>
                         <span class="fn-label ${entry.cssClass || ""}">${entry.desc}</span>
                       </div>`
+                        : ""
                     }`;
         });
         return ganttLeftPanel.append(entries.join(""));
