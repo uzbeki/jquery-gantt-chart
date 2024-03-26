@@ -1,8 +1,8 @@
 {
   "name": "@uzbeki/jquery-gantt-chart",
-  "version": "2024.3.25",
+  "version": "0.2.0",
   "description": "Simple Gantt Chart implemented with modernJS and jQuery. Previously known as jQuery.Gantt.",
-  "main": "index.js",
+  "main": "./dist/jquery.gantt.min.js",
   "engines": {
     "node": ">= 10.0.0"
   },
@@ -10,7 +10,10 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 0"
+    "test": "echo \"Error: no test specified\" && exit 0",
+    "minify-js": "terser src/*.js -o dist/jquery.gantt.min.js --ecma 6 --compress --mangle --source-map",
+    "minify-css": "cleancss src/*.css -o dist/jquery.gantt.min.css -O2",
+    "minify": "npm run minify-js && npm run minify-css"
   },
   "repository": "https://github.com/uzbeki/jquery-gantt-chart.git",
   "keywords": [
@@ -27,5 +30,9 @@
   "bugs": {
     "url": "https://github.com/uzbeki/jquery-gantt-chart/issues"
   },
-  "homepage": "https://github.com/uzbeki/jquery-gantt-chart#readme"
+  "homepage": "https://github.com/uzbeki/jquery-gantt-chart#readme",
+  "devDependencies": {
+    "clean-css-cli": "^5.6.3",
+    "terser": "^5.29.2"
+  }
 }

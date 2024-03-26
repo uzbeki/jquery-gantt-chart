@@ -64,7 +64,7 @@ generateDummyData(1).then(data => {
     onRender: () => console.log("chart rendered"),
     onGetPage: generateDummyData,
   });
-  
+
   // if bootstrap bundle is included
   // $('.bar').popover({
   //   trigger: "hover",

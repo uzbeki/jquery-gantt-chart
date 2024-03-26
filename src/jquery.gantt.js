@@ -1,3 +1,11 @@
+/**
+ * @license MIT
+ * @version 0.2.0
+ * @name jQuery Gantt Chart
+ * @description jQuery Gantt Chart is a simple chart that implements gantt functionality as a jQuery component.
+ * @author Bekhruz Otaev
+ * @link https://github.com/uzbeki/jquery-gantt-chart/
+ */
 (function ($, undefined) {
   "use strict";
 
@@ -221,16 +229,16 @@
         const entries = element.data.map((entry, i) => {
           const dataId = entry?.id ? `data-id="${entry.id}"` : "";
           return `<div class="row name row${i} ${entry.desc ? "" : "fn-wide " + dataId}" 
-                      id="rowheader${i}" data-offset="${(i % settings.itemsPerPage) * tools.getCellSize()}">
-                      <span class="fn-label ${entry.cssClass || ""}">${entry.name || ""}</span>
-                    </div>
-                    ${
-                      entry.desc
-                        ? `<div class="row desc row${i}" id="RowdId_${i}" ${dataId}>
-                        <span class="fn-label ${entry.cssClass || ""}">${entry.desc}</span>
-                      </div>`
-                        : ""
-                    }`;
+                        id="rowheader${i}" data-offset="${(i % settings.itemsPerPage) * tools.getCellSize()}">
+                        <span class="fn-label ${entry.cssClass || ""}">${entry.name || ""}</span>
+                      </div>
+                      ${
+                        entry.desc
+                          ? `<div class="row desc row${i}" id="RowdId_${i}" ${dataId}>
+                          <span class="fn-label ${entry.cssClass || ""}">${entry.desc}</span>
+                        </div>`
+                          : ""
+                      }`;
         });
         return ganttLeftPanel.append(entries.join(""));
       },
@@ -264,8 +272,8 @@
           }
 
           /* Adjust, so get middle of elm
-              corrY -= Math.floor(tools.getCellSize() / 2);
-            */
+                corrY -= Math.floor(tools.getCellSize() / 2);
+              */
 
           // Find column where click occurred
           var col = core.elementFromPoint(e.pageX, datapanel.offset().top + corrY);
@@ -346,8 +354,8 @@
               if (rfy !== year) {
                 yearArr.push(
                   `<div class="row year" style="width: ${tools.getCellSize() * scaleUnitsThisYear}px">
-                      <div class="fn-label">${year}</div>
-                    </div>`
+                        <div class="fn-label">${year}</div>
+                      </div>`
                 );
 
                 year = rfy;
@@ -360,8 +368,8 @@
               if (rm !== month) {
                 monthArr.push(
                   `<div class="row month" style="width: ${tools.getCellSize() * scaleUnitsThisMonth}px">
-                      <div class="fn-label">${settings.months[month]}</div>
-                    </div>`
+                        <div class="fn-label">${settings.months[month]}</div>
+                      </div>`
                 );
 
                 month = rm;
@@ -377,13 +385,13 @@
 
                 dayArr.push(
                   `<div class="row date ${dayClass}" style="width: ${tools.getCellSize() * hoursInDay}px">
-                      <div class="fn-label">${day.getDate()}</div>
-                    </div>`
+                        <div class="fn-label">${day.getDate()}</div>
+                      </div>`
                 );
                 dowArr.push(
                   `<div class="row day ${dayClass}" style="width: ${tools.getCellSize() * hoursInDay}px">
-                      <div class="fn-label">${settings.dow[getDay]}</div>
-                    </div>`
+                        <div class="fn-label">${settings.dow[getDay]}</div>
+                      </div>`
                 );
 
                 day = rday;
@@ -397,24 +405,24 @@
               }
               horArr.push(
                 `<div class="row day ${dayClass}" id="dh-${rday.getTime()}"
-                    data-offset="${i * tools.getCellSize()}" data-repdate="${rday.getRepDate(settings.scale)}">
-                    <div class="fn-label">${rday.getHours()}</div>
-                  </div>`
+                      data-offset="${i * tools.getCellSize()}" data-repdate="${rday.getRepDate(settings.scale)}">
+                      <div class="fn-label">${rday.getHours()}</div>
+                    </div>`
               );
             }
 
             // Last year
             yearArr.push(
               `<div class="row year" style="width: ${tools.getCellSize() * scaleUnitsThisYear}px">
-                  <div class="fn-label">${year}</div>
-                </div>`
+                    <div class="fn-label">${year}</div>
+                  </div>`
             );
 
             // Last month
             monthArr.push(
               `<div class="row month" style="width: ${tools.getCellSize() * scaleUnitsThisMonth}px">
-                  <div class="fn-label">${settings.months[month]}</div>
-                </div>`
+                    <div class="fn-label">${settings.months[month]}</div>
+                  </div>`
             );
 
             dayClass = dowClass[day.getDay()];
@@ -425,14 +433,14 @@
 
             dayArr.push(
               `<div class="row date ${dayClass}" style="width: ${tools.getCellSize() * hoursInDay}px">
-                  <div class="fn-label">${day.getDate()}</div>
-                </div>`
+                    <div class="fn-label">${day.getDate()}</div>
+                  </div>`
             );
 
             dowArr.push(
               `<div class="row day ${dayClass}" style="width: ${tools.getCellSize() * hoursInDay}px">
-                  <div class="fn-label">${settings.dow[day.getDay()]}</div>
-                </div>`
+                    <div class="fn-label">${settings.dow[day.getDay()]}</div>
+                  </div>`
             );
 
             dataPanel = core.dataPanel(element, dataPanelWidth);
@@ -469,8 +477,8 @@
                 diff /= 7;
                 yearArr.push(
                   `<div class="row year" style="width: ${tools.getCellSize() * (scaleUnitsThisYear - diff)}px">
-                      <div class="fn-label">${year}</div>
-                    </div>`
+                        <div class="fn-label">${year}</div>
+                      </div>`
                 );
                 year++;
                 scaleUnitsThisYear = diff;
@@ -486,8 +494,8 @@
                 diff /= 7;
                 monthArr.push(
                   `<div class="row month" style="width: ${tools.getCellSize() * (scaleUnitsThisMonth - diff)}px">
-                      <div class="fn-label">${settings.months[month]}</div>
-                    </div>`
+                        <div class="fn-label">${settings.months[month]}</div>
+                      </div>`
                 );
                 month = rday.getMonth();
                 scaleUnitsThisMonth = diff;
@@ -499,24 +507,24 @@
               // Fill weeks
               dayArr.push(
                 `<div class="row day ${_dayClass}" id="${rday.getWeekId()}" 
-                    data-offset="${i * tools.getCellSize()}" data-repdate="${rday.getRepDate(settings.scale)}">
-                    <div class="fn-label">${week}</div>
-                  </div>`
+                      data-offset="${i * tools.getCellSize()}" data-repdate="${rday.getRepDate(settings.scale)}">
+                      <div class="fn-label">${week}</div>
+                    </div>`
               );
             }
 
             // Last year
             yearArr.push(
               `<div class="row year" style="width: ${tools.getCellSize() * scaleUnitsThisYear}px">
-                  <div class="fn-label">${year}</div>
-                </div>`
+                    <div class="fn-label">${year}</div>
+                  </div>`
             );
 
             // Last month
             monthArr.push(
               `<div class="row month" style="width: ${tools.getCellSize() * scaleUnitsThisMonth}px">
-                  <div class="fn-label">${settings.months[month]}</div>
-                </div>`
+                    <div class="fn-label">${settings.months[month]}</div>
+                  </div>`
             );
 
             dataPanel = core.dataPanel(element, dataPanelWidth);
@@ -544,8 +552,8 @@
               if (rday.getFullYear() !== year) {
                 yearArr.push(
                   `<div class="row year" style="width: ${tools.getCellSize() * scaleUnitsThisYear}px">
-                      <div class="fn-label">${year}</div>
-                    </div>`
+                        <div class="fn-label">${year}</div>
+                      </div>`
                 );
                 year = rday.getFullYear();
                 scaleUnitsThisYear = 0;
@@ -553,17 +561,17 @@
               scaleUnitsThisYear++;
               monthArr.push(
                 `<div class="row day wd" id="dh-${tools.genId(rday)}"
-                    data-offset="${i * tools.getCellSize()}" data-repdate="${rday.getRepDate(settings.scale)}">
-                    ${1 + rday.getMonth()}
-                  </div>`
+                      data-offset="${i * tools.getCellSize()}" data-repdate="${rday.getRepDate(settings.scale)}">
+                      ${1 + rday.getMonth()}
+                    </div>`
               );
             }
 
             // Last year
             yearArr.push(
               `<div class="row year" style="width: ${tools.getCellSize() * scaleUnitsThisYear}px">
-                  <div class="fn-label">${year}</div>
-                </div>`
+                    <div class="fn-label">${year}</div>
+                  </div>`
             );
 
             dataPanel = core.dataPanel(element, dataPanelWidth);
@@ -587,8 +595,8 @@
               if (rday.getFullYear() !== year) {
                 yearArr.push(
                   `<div class="row year" style="width: ${tools.getCellSize() * scaleUnitsThisYear}px">
-                      <div class="fn-label">${year}</div>
-                    </div>`
+                        <div class="fn-label">${year}</div>
+                      </div>`
                 );
                 year = rday.getFullYear();
                 scaleUnitsThisYear = 0;
@@ -599,8 +607,8 @@
               if (rday.getMonth() !== month) {
                 monthArr.push(
                   `<div class="row month" style="width: ${tools.getCellSize() * scaleUnitsThisMonth}px">
-                      <div class="fn-label">${settings.months[month]}</div>
-                    </div>`
+                        <div class="fn-label">${settings.months[month]}</div>
+                      </div>`
                 );
                 month = rday.getMonth();
                 scaleUnitsThisMonth = 0;
@@ -617,30 +625,30 @@
 
               dayArr.push(
                 `<div class="row date ${_dayClass}" id="dh-${tools.genId(rday)}"
-                    data-offset="${i * tools.getCellSize()}" data-repdate="${rday.getRepDate(settings.scale)}">
-                    <div class="fn-label">${rday.getDate()}</div>
-                  </div>`
+                      data-offset="${i * tools.getCellSize()}" data-repdate="${rday.getRepDate(settings.scale)}">
+                      <div class="fn-label">${rday.getDate()}</div>
+                    </div>`
               );
               dowArr.push(
                 `<div class="row day ${_dayClass}" id="dw-${tools.genId(rday)}" 
-                    data-repdate="${rday.getRepDate(settings.scale)}">
-                    <div class="fn-label">${settings.dow[day]}</div>
-                  </div>`
+                      data-repdate="${rday.getRepDate(settings.scale)}">
+                      <div class="fn-label">${settings.dow[day]}</div>
+                    </div>`
               );
             } //for
 
             // Last year
             yearArr.push(
               `<div class="row year" style="width: ${tools.getCellSize() * scaleUnitsThisYear}px">
-                  <div class="fn-label">${year}</div>
-                </div>`
+                    <div class="fn-label">${year}</div>
+                  </div>`
             );
 
             // Last month
             monthArr.push(
               `<div class="row month" style="width: ${tools.getCellSize() * scaleUnitsThisMonth}px">
-                  <div class="fn-label">${settings.months[month]}</div>
-                </div>`
+                    <div class="fn-label">${settings.months[month]}</div>
+                  </div>`
             );
 
             dataPanel = core.dataPanel(element, dataPanelWidth);
@@ -669,10 +677,10 @@
                 $('<div class="nav-slider-left" />')
                   .append(
                     $(`<button type="button" class="btn btn-outline-dark nav-page-back" title="Previous page">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-dash-circle" viewBox="0 0 16 16">
-                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
-                        <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8"/>
-                      </svg></button>`).on("click", () => core.navigatePage(element, -1))
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-dash-circle" viewBox="0 0 16 16">
+                          <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                          <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8"/>
+                        </svg></button>`).on("click", () => core.navigatePage(element, -1))
                   )
                   .append(
                     $(
@@ -681,24 +689,24 @@
                   )
                   .append(
                     $(`<button type="button" class="btn btn-outline-dark nav-page-next" title="Next page">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 16">
-                          <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
-                          <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
-                        </svg></button>`).on("click", () => core.navigatePage(element, 1))
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 16">
+                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+                          </svg></button>`).on("click", () => core.navigatePage(element, 1))
                   )
                   .append(
                     $(`<button type="button" class="btn btn-outline-dark nav-now" title="Show current time">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-crosshair" viewBox="0 0 16 16">
-                        <path d="M8.5.5a.5.5 0 0 0-1 0v.518A7 7 0 0 0 1.018 7.5H.5a.5.5 0 0 0 0 1h.518A7 7 0 0 0 7.5 14.982v.518a.5.5 0 0 0 1 0v-.518A7 7 0 0 0 14.982 8.5h.518a.5.5 0 0 0 0-1h-.518A7 7 0 0 0 8.5 1.018zm-6.48 7A6 6 0 0 1 7.5 2.02v.48a.5.5 0 0 0 1 0v-.48a6 6 0 0 1 5.48 5.48h-.48a.5.5 0 0 0 0 1h.48a6 6 0 0 1-5.48 5.48v-.48a.5.5 0 0 0-1 0v.48A6 6 0 0 1 2.02 8.5h.48a.5.5 0 0 0 0-1zM8 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4"/>
-                      </svg></button>`).on("click", () => core.navigateTo(element, "now"))
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-crosshair" viewBox="0 0 16 16">
+                          <path d="M8.5.5a.5.5 0 0 0-1 0v.518A7 7 0 0 0 1.018 7.5H.5a.5.5 0 0 0 0 1h.518A7 7 0 0 0 7.5 14.982v.518a.5.5 0 0 0 1 0v-.518A7 7 0 0 0 14.982 8.5h.518a.5.5 0 0 0 0-1h-.518A7 7 0 0 0 8.5 1.018zm-6.48 7A6 6 0 0 1 7.5 2.02v.48a.5.5 0 0 0 1 0v-.48a6 6 0 0 1 5.48 5.48h-.48a.5.5 0 0 0 0 1h.48a6 6 0 0 1-5.48 5.48v-.48a.5.5 0 0 0-1 0v.48A6 6 0 0 1 2.02 8.5h.48a.5.5 0 0 0 0-1zM8 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4"/>
+                        </svg></button>`).on("click", () => core.navigateTo(element, "now"))
                   )
                   .append(
                     $(
                       `<button type="button" class="btn btn-outline-dark nav-prev-week" title="Slide more to the left">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-left" viewBox="0 0 16 16">
-                          <path fill-rule="evenodd" d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
-                          <path fill-rule="evenodd" d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
-                        </svg></button>`
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-left" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
+                            <path fill-rule="evenodd" d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
+                          </svg></button>`
                     ).on("click", function () {
                       if (settings.scale === "hours") {
                         core.navigateTo(element, tools.getCellSize() * 8); // 8 hours
@@ -713,9 +721,9 @@
                   )
                   .append(
                     $(`<button type="button" class="btn btn-outline-dark nav-prev-day" title="Slide to the left">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
-                          <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
-                        </svg></button>`).on("click", function () {
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
+                          </svg></button>`).on("click", function () {
                       if (settings.scale === "hours") {
                         core.navigateTo(element, tools.getCellSize() * 4);
                       } else if (settings.scale === "days") {
@@ -733,9 +741,9 @@
                 $('<div class="nav-slider-right" />')
                   .append(
                     $(`<button type="button" class="btn btn-outline-dark nav-next-day" title="Slide to the right">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-right" viewBox="0 0 16 16">
-                          <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/>
-                        </svg></button>`).on("click", function () {
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-right" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/>
+                          </svg></button>`).on("click", function () {
                       if (settings.scale === "hours") {
                         core.navigateTo(element, tools.getCellSize() * -4);
                       } else if (settings.scale === "days") {
@@ -750,10 +758,10 @@
                   .append(
                     $(
                       `<button type="button" class="btn btn-outline-dark nav-next-week" title="Slide more to the right">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-right" viewBox="0 0 16 16">
-                          <path fill-rule="evenodd" d="M3.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L9.293 8 3.646 2.354a.5.5 0 0 1 0-.708"/>
-                          <path fill-rule="evenodd" d="M7.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L13.293 8 7.646 2.354a.5.5 0 0 1 0-.708"/>
-                        </svg></button>`
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-right" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M3.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L9.293 8 3.646 2.354a.5.5 0 0 1 0-.708"/>
+                            <path fill-rule="evenodd" d="M7.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L13.293 8 7.646 2.354a.5.5 0 0 1 0-.708"/>
+                          </svg></button>`
                     ).on("click", function () {
                       if (settings.scale === "hours") {
                         core.navigateTo(element, tools.getCellSize() * -8);
@@ -768,19 +776,19 @@
                   )
                   .append(
                     $(`<button type="button" class="btn btn-outline-dark nav-zoomIn" title="Zoom in">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-zoom-in" viewBox="0 0 16 16">
-                          <path fill-rule="evenodd" d="M6.5 12a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11M13 6.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0"/>
-                          <path d="M10.344 11.742q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1 6.5 6.5 0 0 1-1.398 1.4z"/>
-                          <path fill-rule="evenodd" d="M6.5 3a.5.5 0 0 1 .5.5V6h2.5a.5.5 0 0 1 0 1H7v2.5a.5.5 0 0 1-1 0V7H3.5a.5.5 0 0 1 0-1H6V3.5a.5.5 0 0 1 .5-.5"/>
-                        </svg></button>`).on("click", () => core.zoomInOut(element, -1))
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-zoom-in" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M6.5 12a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11M13 6.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0"/>
+                            <path d="M10.344 11.742q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1 6.5 6.5 0 0 1-1.398 1.4z"/>
+                            <path fill-rule="evenodd" d="M6.5 3a.5.5 0 0 1 .5.5V6h2.5a.5.5 0 0 1 0 1H7v2.5a.5.5 0 0 1-1 0V7H3.5a.5.5 0 0 1 0-1H6V3.5a.5.5 0 0 1 .5-.5"/>
+                          </svg></button>`).on("click", () => core.zoomInOut(element, -1))
                   )
                   .append(
                     $(`<button type="button" class="btn btn-outline-dark nav-zoomOut" title="Zoom out">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-zoom-out" viewBox="0 0 16 16">
-                          <path fill-rule="evenodd" d="M6.5 12a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11M13 6.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0"/>
-                          <path d="M10.344 11.742q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1 6.5 6.5 0 0 1-1.398 1.4z"/>
-                          <path fill-rule="evenodd" d="M3 6.5a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5"/>
-                        </svg></button>`).on("click", () => core.zoomInOut(element, 1))
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-zoom-out" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M6.5 12a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11M13 6.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0"/>
+                            <path d="M10.344 11.742q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1 6.5 6.5 0 0 1-1.398 1.4z"/>
+                            <path fill-rule="evenodd" d="M3 6.5a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5"/>
+                          </svg></button>`).on("click", () => core.zoomInOut(element, 1))
                   )
               )
           );
@@ -789,82 +797,82 @@
           ganttNavigate = $('<div class="navigate" />')
             .append(
               $(`<button type="button" class="btn btn-outline-dark nav-page-back" title="Previous page">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-dash-circle" viewBox="0 0 16 16">
-                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
-                <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8"/>
-              </svg></button>`).on("click", () => core.navigatePage(element, -1))
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-dash-circle" viewBox="0 0 16 16">
+                  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                  <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8"/>
+                </svg></button>`).on("click", () => core.navigatePage(element, -1))
             )
             .append(
               $(`<div class="page-number text-md-left"><span>${element.pageNum} / ${element.pageCount}</span></div>`)
             )
             .append(
               $(`<button type="button" class="btn btn-outline-dark nav-page-next" title="Next page">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 16">
-                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
-                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
-                  </svg></button>`).on("click", () => core.navigatePage(element, 1))
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 16">
+                      <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                      <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+                    </svg></button>`).on("click", () => core.navigatePage(element, 1))
             )
             .append(
               $(`<button type="button" class="btn btn-outline-dark nav-begin" title="Go to the beginning">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-skip-backward-circle" viewBox="0 0 16 16">
-                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
-                    <path d="M11.729 5.055a.5.5 0 0 0-.52.038L8.5 7.028V5.5a.5.5 0 0 0-.79-.407L5 7.028V5.5a.5.5 0 0 0-1 0v5a.5.5 0 0 0 1 0V8.972l2.71 1.935a.5.5 0 0 0 .79-.407V8.972l2.71 1.935A.5.5 0 0 0 12 10.5v-5a.5.5 0 0 0-.271-.445"/>
-                  </svg></button>`).on("click", () => core.navigateTo(element, "begin"))
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-skip-backward-circle" viewBox="0 0 16 16">
+                      <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                      <path d="M11.729 5.055a.5.5 0 0 0-.52.038L8.5 7.028V5.5a.5.5 0 0 0-.79-.407L5 7.028V5.5a.5.5 0 0 0-1 0v5a.5.5 0 0 0 1 0V8.972l2.71 1.935a.5.5 0 0 0 .79-.407V8.972l2.71 1.935A.5.5 0 0 0 12 10.5v-5a.5.5 0 0 0-.271-.445"/>
+                    </svg></button>`).on("click", () => core.navigateTo(element, "begin"))
             )
             .append(
               $(`<button type="button" class="btn btn-outline-dark nav-prev-week" title="Slide more to the left">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-left" viewBox="0 0 16 16">
-                  <path fill-rule="evenodd" d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
-                  <path fill-rule="evenodd" d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
-                </svg></button>`).on("click", () => core.navigateTo(element, tools.getCellSize() * 7))
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-left" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
+                    <path fill-rule="evenodd" d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
+                  </svg></button>`).on("click", () => core.navigateTo(element, tools.getCellSize() * 7))
             )
             .append(
               $(`<button type="button" class="btn btn-outline-dark nav-prev-day" title="Slide to the left">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
-                  <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
-                </svg></button>`).on("click", () => core.navigateTo(element, tools.getCellSize()))
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
+                  </svg></button>`).on("click", () => core.navigateTo(element, tools.getCellSize()))
             )
             .append(
               $(`<button type="button" class="btn btn-outline-dark nav-now" title="Show current time">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-crosshair" viewBox="0 0 16 16">
-                    <path d="M8.5.5a.5.5 0 0 0-1 0v.518A7 7 0 0 0 1.018 7.5H.5a.5.5 0 0 0 0 1h.518A7 7 0 0 0 7.5 14.982v.518a.5.5 0 0 0 1 0v-.518A7 7 0 0 0 14.982 8.5h.518a.5.5 0 0 0 0-1h-.518A7 7 0 0 0 8.5 1.018zm-6.48 7A6 6 0 0 1 7.5 2.02v.48a.5.5 0 0 0 1 0v-.48a6 6 0 0 1 5.48 5.48h-.48a.5.5 0 0 0 0 1h.48a6 6 0 0 1-5.48 5.48v-.48a.5.5 0 0 0-1 0v.48A6 6 0 0 1 2.02 8.5h.48a.5.5 0 0 0 0-1zM8 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4"/>
-                  </svg></button>`).on("click", () => core.navigateTo(element, "now"))
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-crosshair" viewBox="0 0 16 16">
+                      <path d="M8.5.5a.5.5 0 0 0-1 0v.518A7 7 0 0 0 1.018 7.5H.5a.5.5 0 0 0 0 1h.518A7 7 0 0 0 7.5 14.982v.518a.5.5 0 0 0 1 0v-.518A7 7 0 0 0 14.982 8.5h.518a.5.5 0 0 0 0-1h-.518A7 7 0 0 0 8.5 1.018zm-6.48 7A6 6 0 0 1 7.5 2.02v.48a.5.5 0 0 0 1 0v-.48a6 6 0 0 1 5.48 5.48h-.48a.5.5 0 0 0 0 1h.48a6 6 0 0 1-5.48 5.48v-.48a.5.5 0 0 0-1 0v.48A6 6 0 0 1 2.02 8.5h.48a.5.5 0 0 0 0-1zM8 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4"/>
+                    </svg></button>`).on("click", () => core.navigateTo(element, "now"))
             )
             .append(
               $(`<button type="button" class="btn btn-outline-dark nav-next-day" title="Slide to the right">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-right" viewBox="0 0 16 16">
-                    <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/>
-                  </svg></button>`).on("click", () => core.navigateTo(element, tools.getCellSize() * -1))
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-right" viewBox="0 0 16 16">
+                      <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/>
+                    </svg></button>`).on("click", () => core.navigateTo(element, tools.getCellSize() * -1))
             )
             .append(
               $(`<button type="button" class="btn btn-outline-dark nav-next-week" title="Slide more to the right">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-right" viewBox="0 0 16 16">
-                    <path fill-rule="evenodd" d="M3.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L9.293 8 3.646 2.354a.5.5 0 0 1 0-.708"/>
-                    <path fill-rule="evenodd" d="M7.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L13.293 8 7.646 2.354a.5.5 0 0 1 0-.708"/>
-                  </svg></button>`).on("click", () => core.navigateTo(element, tools.getCellSize() * -7))
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-right" viewBox="0 0 16 16">
+                      <path fill-rule="evenodd" d="M3.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L9.293 8 3.646 2.354a.5.5 0 0 1 0-.708"/>
+                      <path fill-rule="evenodd" d="M7.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L13.293 8 7.646 2.354a.5.5 0 0 1 0-.708"/>
+                    </svg></button>`).on("click", () => core.navigateTo(element, tools.getCellSize() * -7))
             )
             .append(
               $(`<button type="button" class="btn btn-outline-dark nav-end" title="Go to the end">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-skip-forward-circle" viewBox="0 0 16 16">
-                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
-                    <path d="M4.271 5.055a.5.5 0 0 1 .52.038L7.5 7.028V5.5a.5.5 0 0 1 .79-.407L11 7.028V5.5a.5.5 0 0 1 1 0v5a.5.5 0 0 1-1 0V8.972l-2.71 1.935a.5.5 0 0 1-.79-.407V8.972l-2.71 1.935A.5.5 0 0 1 4 10.5v-5a.5.5 0 0 1 .271-.445"/>
-                  </svg></button>`).on("click", () => core.navigateTo(element, "end"))
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-skip-forward-circle" viewBox="0 0 16 16">
+                      <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                      <path d="M4.271 5.055a.5.5 0 0 1 .52.038L7.5 7.028V5.5a.5.5 0 0 1 .79-.407L11 7.028V5.5a.5.5 0 0 1 1 0v5a.5.5 0 0 1-1 0V8.972l-2.71 1.935a.5.5 0 0 1-.79-.407V8.972l-2.71 1.935A.5.5 0 0 1 4 10.5v-5a.5.5 0 0 1 .271-.445"/>
+                    </svg></button>`).on("click", () => core.navigateTo(element, "end"))
             )
             .append(
               $(`<button type="button" class="btn btn-outline-dark nav-zoomIn" title="Zoom in">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-zoom-in" viewBox="0 0 16 16">
-                    <path fill-rule="evenodd" d="M6.5 12a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11M13 6.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0"/>
-                    <path d="M10.344 11.742q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1 6.5 6.5 0 0 1-1.398 1.4z"/>
-                    <path fill-rule="evenodd" d="M6.5 3a.5.5 0 0 1 .5.5V6h2.5a.5.5 0 0 1 0 1H7v2.5a.5.5 0 0 1-1 0V7H3.5a.5.5 0 0 1 0-1H6V3.5a.5.5 0 0 1 .5-.5"/>
-                  </svg></button>`).on("click", () => core.zoomInOut(element, -1))
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-zoom-in" viewBox="0 0 16 16">
+                      <path fill-rule="evenodd" d="M6.5 12a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11M13 6.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0"/>
+                      <path d="M10.344 11.742q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1 6.5 6.5 0 0 1-1.398 1.4z"/>
+                      <path fill-rule="evenodd" d="M6.5 3a.5.5 0 0 1 .5.5V6h2.5a.5.5 0 0 1 0 1H7v2.5a.5.5 0 0 1-1 0V7H3.5a.5.5 0 0 1 0-1H6V3.5a.5.5 0 0 1 .5-.5"/>
+                    </svg></button>`).on("click", () => core.zoomInOut(element, -1))
             )
             .append(
               $(`<button type="button" class="btn btn-outline-dark nav-zoomOut" title="Zoom out">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-zoom-out" viewBox="0 0 16 16">
-                    <path fill-rule="evenodd" d="M6.5 12a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11M13 6.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0"/>
-                    <path d="M10.344 11.742q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1 6.5 6.5 0 0 1-1.398 1.4z"/>
-                    <path fill-rule="evenodd" d="M3 6.5a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5"/>
-                  </svg></button>`).on("click", () => core.zoomInOut(element, 1))
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-zoom-out" viewBox="0 0 16 16">
+                      <path fill-rule="evenodd" d="M6.5 12a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11M13 6.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0"/>
+                      <path d="M10.344 11.742q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1 6.5 6.5 0 0 1-1.398 1.4z"/>
+                      <path fill-rule="evenodd" d="M3 6.5a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5"/>
+                    </svg></button>`).on("click", () => core.zoomInOut(element, 1))
             )
             .append(core.progressBarLogic(element));
         }
@@ -873,11 +881,11 @@
 
       progressBarLogic: function (element) {
         const progressContainer = $(`
-            <div class="progress bg-light border border-dark ${settings.navigate === "scroll" ? "" : "d-none"} 
-              ${element.canScroll ? "canScroll" : ""}" title="Click to set progress, or (ctrl) shift+wheel to scroll">
-                <div class="progress-bar bg-light text-dark" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
-                <div class="circle" draggable="true" tabindex="0"></div>
-            </div>`);
+              <div class="progress bg-light border border-dark ${settings.navigate === "scroll" ? "" : "d-none"} 
+                ${element.canScroll ? "canScroll" : ""}" title="Click to set progress, or (ctrl) shift+wheel to scroll">
+                  <div class="progress-bar bg-light text-dark" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                  <div class="circle" draggable="true" tabindex="0"></div>
+              </div>`);
 
         const circle = progressContainer.find(".circle").get(0);
         circle.addEventListener("mousedown", function (event) {
@@ -930,8 +938,8 @@
         const l = d => new Date(d).toLocaleString();
         var bar = $(
           `<div class="bar" title="${label}" data-bs-content="From ${l(dataObj.from)} to ${l(dataObj.to)}">
-              <div class="fn-label">${label}</div>
-            </div>`
+                <div class="fn-label">${label}</div>
+              </div>`
         ).data("dataObj", dataObj);
         if (classNames) {
           bar.addClass(classNames);

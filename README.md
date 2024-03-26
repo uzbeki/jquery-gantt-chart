@@ -21,9 +21,22 @@ Plugin was tested and should work on:
 All major browsers that support ES6 or above.
 
 ## Requirements:
-- jQuery v1.10.2 or above
+- jQuery v1.10.2 or above:
+```html
+<script defer src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+```
+
 ## Usage
 Simply include the plugin in your html file and call it on a div element. 
+
+### Download the plugin and include it in your html file
+
+```html
+<link rel="stylesheet" href="../dist/jquery.gantt.min.css">
+<script defer src="../dist/jquery.gantt.min.js"></script>
+```
+
+
 ```js
 $("#gantt").gantt({
     source: data, // json data
