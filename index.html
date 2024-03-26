@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- <meta name="color-scheme" content="dark light"> -->
+        <meta name="author" content="Bekhruz Otaev">
+        <meta name="description" content="jQuery Gantt Chart Demo">
+        <meta name="keywords" content="jQuery, Gantt Chart, Demo, Bekhruz Otaev">
+        <meta name="url" content="https://bekhruz.com">
+        <meta name="github" content="https://github.com/uzbeki/jquery-gantt-chart">
+        <meta name="npm" content="https://www.npmjs.com/package/@uzbeki/jquery-gantt-chart">
+        <link rel="stylesheet" href="./dist/jquery.gantt.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+        <script src="./dist/jquery.gantt.min.js"></script>
+        <title>jQuery Gantt Chart Demo</title>
+        <style>
+            #gantt {
+                width: 100%;
+                margin: 1rem auto;
+                border: 1px solid #ddd;
+                position: relative;
+                border-radius: 8px;
+                overflow: hidden;
+            }
+
+            #gantt:after {
+                content: ".";
+                visibility: hidden;
+                display: block;
+                height: 0;
+                clear: both;
+            }
+
+        </style>
+
+    </head>
+
+    <body>
+        <h1>Gantt Chart as jQuery Component demo</h1>
+        <p>Simple and fast plugin to create gantt charts for modern browsers</p>
+        <div id="gantt"></div>
+        <section>
+            <h2>Features</h2>
+            <ul>
+                <li>Pagination support, page data handler set inside <code>onGetPage</code> option</li>
+                <li>Customizable cell size with <code>cellSize</code> option</li>
+                <li>Customizable task(bar) colors with <code>data[i].values[j].customClass</code></li>
+                <li>Display short description as hints</li>
+                <li>Scroll with <code>Shift+mouseWheel</code>, or faster scroll with <code>Ctrl+Shift+mouseWheel</code>
+                </li>
+                <li>Mark holidays or today</li>
+                <li>Zoom in/out</li>
+            </ul>
+            <p>For more, please refer to <a href="https://github.com/uzbeki/jquery-gantt-chart#readme">README file</a>.</p>
+        </section>
+        
+        <script>
+            /**
+             * Generates dummy data for a Gantt chart.
+             * @param {number} [page=1] - The page number.
+             * @returns {Promise<{
+             *   data: Array<{
+             *     id: number,
+             *     name: string,
+             *     desc: string,
+             *     values: Array<{
+             *       from: Date,
+             *       to: Date,
+             *       label: string,
+             *       desc: string,
+             *       customClass: string
+             *     }>
+             *   }>,
+             *   currentPage: number,
+             *   pageCount: number,
+             *   itemsPerPage: number
+             * }>} The generated dummy data.
+             */
+            const generateDummyData = async (page = 1) => {
+                const generateRandomNumber = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
+                const totalPages = 10;
+                const itemsPerPage = 10;
+                if (page > totalPages) {
+                    return { data: [], currentPage: page, pageCount: totalPages, itemsPerPage: 10 };
+                }
+                const data = [];
+                for (let i = 1; i <= itemsPerPage; i++) {
+                    const values = Array.from({ length: generateRandomNumber(1, 100) }, (_, j) => {
+                        const thisYear = generateRandomNumber(2024, 2025);
+                        const randomMonth = generateRandomNumber(1, 12);
+                        const randomFrom = new Date(thisYear, randomMonth, generateRandomNumber(1, 10) + j + page * 10);
+                        const randomTo = new Date(thisYear, randomMonth, generateRandomNumber(10, 25) + j + page * 10);
+
+                        return {
+                            from: randomFrom,
+                            to: randomTo,
+                            label: `Task ${j}`,
+                            desc: `Task ${j} description`,
+                            customClass: "ganttRed",
+                        };
+                    });
+
+                    data.push({
+                        id: i,
+                        name: `Sprint ${i}`,
+                        desc: `Description ${i}`,
+                        values,
+                    });
+                }
+                return { data, currentPage: page, pageCount: totalPages, itemsPerPage: itemsPerPage };
+            };
+
+            generateDummyData(1).then(data => {
+                $("#gantt").gantt({
+                    source: data,
+                    navigate: "scroll", // buttons, scroll
+                    scale: "days",
+                    cellSize: 26,
+                    onItemClick: console.log,
+                    onAddClick: console.log,
+                    onRender: () => console.log("chart rendered"),
+                    onGetPage: generateDummyData,
+                });
+
+                // if bootstrap bundle is included
+                // $('.bar').popover({
+                //   trigger: "hover",
+                //   html: true,
+                // });
+            });
+        </script>
+    </body>
+
+</html>

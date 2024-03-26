@@ -1,6 +1,6 @@
 /**
  * @license MIT
- * @version 0.2.0
+ * @version 0.2.1
  * @name jQuery Gantt Chart
  * @description jQuery Gantt Chart is a simple chart that implements gantt functionality as a jQuery component.
  * @author Bekhruz Otaev
@@ -86,8 +86,8 @@
     var scales = ["hours", "days", "weeks", "months"];
     //Default settings
     var settings = {
-      cellSize: 20, // cell size for the gantt chart
-      source: [],
+      cellSize: 24, // cell size for the gantt chart
+      source: {},
       holidays: [],
       // paging
       itemsPerPage: 10,
