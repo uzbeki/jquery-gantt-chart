@@ -1,6 +1,6 @@
 {
   "name": "@uzbeki/jquery-gantt-chart",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Simple Gantt Chart implemented with modernJS and jQuery. Previously known as jQuery.Gantt.",
   "main": "./dist/jquery.gantt.min.js",
   "engines": {

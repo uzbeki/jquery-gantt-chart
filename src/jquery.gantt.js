@@ -1,6 +1,6 @@
 /**
  * @license MIT
- * @version 0.2.1
+ * @version 0.2.2
  * @name jQuery Gantt Chart
  * @description jQuery Gantt Chart is a simple chart that implements gantt functionality as a jQuery component.
  * @author Bekhruz Otaev
@@ -228,19 +228,14 @@
 
         const entries = element.data.map((entry, i) => {
           const dataId = entry?.id ? `data-id="${entry.id}"` : "";
-          return `<div class="row name row${i} ${entry.desc ? "" : "fn-wide " + dataId}" 
-                        id="rowheader${i}" data-offset="${(i % settings.itemsPerPage) * tools.getCellSize()}">
-                        <span class="fn-label ${entry.cssClass || ""}">${entry.name || ""}</span>
-                      </div>
-                      ${
-                        entry.desc
-                          ? `<div class="row desc row${i}" id="RowdId_${i}" ${dataId}>
-                          <span class="fn-label ${entry.cssClass || ""}">${entry.desc}</span>
-                        </div>`
-                          : ""
-                      }`;
+          const offset = (i % settings.itemsPerPage) * tools.getCellSize();
+          return `<li class="row fn-label row${i} ${entry.cssClass || ""}" ${dataId} 
+            id="rowheader${i}" data-offset="${offset}">
+            ${entry.name || ""} ${entry.desc ? "(" + entry.desc + ")" : ""}
+          </li>`;
         });
-        return ganttLeftPanel.append(entries.join(""));
+        const rowList = $('<ul class="row-list"/>');
+        return ganttLeftPanel.append(rowList.append(entries.join("")));
       },
 
       // Create and return the data panel element
