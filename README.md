@@ -1,3 +1,22 @@
+<p align="center">
+  <a href="https://github.com/uzbeki/jquery-gantt-chart#readme" target="_blank">
+    <img src="https://github.com/uzbeki/jquery-gantt-chart/blob/main/logo.png" alt="jQuery Gantt Chart" style="border-radius:50%;"/><br/>
+  </a>
+    jQuery Gantt Chart is a simple and fast plugin that implements gantt functionality as a jQuery component.
+</p>
+
+<div align="center">
+
+[![GitHub release](https://img.shields.io/github/release/uzbeki/jquery-gantt-chart.svg)](https://github.com/uzbeki/jquery-gantt-chart/releases)
+[![Npm package version](https://badgen.net/npm/v/@uzbeki/jquery-gantt-chart)](https://www.npmjs.com/package/@uzbeki/jquery-gantt-chart)
+[![GitHub license](https://img.shields.io/github/license/uzbeki/jquery-gantt-chart.svg)](https://github.com/uzbeki/jquery-gantt-chart/blob/main/LICENSE)
+[![Npm package total downloads](https://badgen.net/npm/dt/@uzbeki/jquery-gantt-chart)](https://npmjs.com/package/@uzbeki/jquery-gantt-chart)
+[![](https://data.jsdelivr.com/v1/package/npm/@uzbeki/jquery-gantt-chart/badge)](https://www.jsdelivr.com/package/npm/@uzbeki/jquery-gantt-chart)
+
+![jQuery](https://img.shields.io/badge/jquery-%230769AD.svg?style=for-the-badge&logo=jquery&logoColor=white)
+
+</div>
+
 ## [Demo and Documentation](https://github.com/uzbeki/jquery-gantt-chart/)
 This is a fork of the original [jquery-gantt](https://github.com/taitems/jQuery.Gantt). It was not maintained for a long time and I decided to fork it and make it work with modern browsers and jQuery versions. I also added some new features and fixed some bugs.
 
