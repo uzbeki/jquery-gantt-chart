@@ -1,12 +1,15 @@
 /**
  * @license MIT
- * @version 0.2.2
+ * @version 0.3.0
  * @name jQuery Gantt Chart
  * @description jQuery Gantt Chart is a simple chart that implements gantt functionality as a jQuery component.
  * @author Bekhruz Otaev
  * @link https://github.com/uzbeki/jquery-gantt-chart/
  */
-(function ($, undefined) {
+
+import DragAndSort, { getOrder } from "./helpers/index.js";
+
+function main() {
   "use strict";
 
   var UTC_DAY_IN_MS = 24 * 60 * 60 * 1000; // Number of milliseconds in a day
@@ -124,6 +127,7 @@
       onAddClick: (dt, rowId) => {},
       onRender: () => {},
       onGetPage: async page => {},
+      enableOrderSaving: true,
     };
 
     // read options
@@ -145,11 +149,19 @@
       })(),
 
       setData: (element, data) => {
-        element.data = data.data;
         element.pageNum = data.currentPage;
         element.pageCount = data.pageCount;
         element.totalItems = data.totalItems;
         settings.itemsPerPage = data.itemsPerPage;
+
+        const order = getOrder(`page${element.pageNum}_dragAndSortOrder`);
+        element.data = core.reOrderData(data.data, order);
+      },
+
+      reOrderData: (data, _newOrder) => {
+        if (!settings.enableOrderSaving || !_newOrder.length) return data;
+        const newOrder = _newOrder.map(id => parseInt(id.replace("rowheader", "")));
+        return data.sort((a, b) => newOrder.indexOf(a.id) - newOrder.indexOf(b.id));
       },
 
       // **Create the chart**
@@ -216,6 +228,14 @@
         }
 
         $dataPanel.css({ height: $leftPanel.height() });
+        new DragAndSort(".fn-gantt .leftPanel .row-list", {
+          enableOrderSaving: settings.enableOrderSaving,
+          onSort: function (order) {
+            element.data = core.reOrderData(element.data, order);
+            core.render(element);
+          },
+          lsKeyName: `page${element.pageNum}_dragAndSortOrder`,
+        });
         settings.onRender();
       },
 
@@ -230,7 +250,7 @@
           const dataId = entry?.id ? `data-id="${entry.id}"` : "";
           const offset = (i % settings.itemsPerPage) * tools.getCellSize();
           return `<li class="row fn-label row${i} ${entry.cssClass || ""}" ${dataId} 
-            id="rowheader${i}" data-offset="${offset}">
+            id="rowheader${entry.id}" data-offset="${offset}">
             ${entry.name || ""} ${entry.desc ? "(" + entry.desc + ")" : ""}
           </li>`;
         });
@@ -987,7 +1007,7 @@
                 _bar = core.createProgressBar(day.label, day.desc, day.customClass, day);
 
                 // find row
-                topEl = $(element).find("#rowheader" + i);
+                topEl = $(element).find("#rowheader" + entry.id);
                 top = cellWidth * 5 + barOffset + topEl.data("offset");
                 _bar.css({
                   top: top,
@@ -1013,7 +1033,7 @@
                 _bar = core.createProgressBar(day.label, day.desc, day.customClass, day);
 
                 // find row
-                topEl = $(element).find("#rowheader" + i);
+                topEl = $(element).find("#rowheader" + entry.id);
                 top = cellWidth * 3 + barOffset + topEl.data("offset");
                 _bar.css({
                   top: top,
@@ -1051,7 +1071,7 @@
                 _bar = core.createProgressBar(day.label, day.desc, day.customClass, day);
 
                 // find row
-                topEl = $(element).find("#rowheader" + i);
+                topEl = $(element).find("#rowheader" + entry.id);
                 top = cellWidth * 2 + barOffset + topEl.data("offset");
                 _bar.css({
                   top: top,
@@ -1076,7 +1096,7 @@
                 _bar = core.createProgressBar(day.label, day.desc, day.customClass, day);
 
                 // find row
-                topEl = $(element).find("#rowheader" + i);
+                topEl = $(element).find("#rowheader" + entry.id);
                 top = cellWidth * 4 + barOffset + topEl.data("offset");
                 _bar.css({
                   top: top,
@@ -1524,4 +1544,7 @@
       core.create(this);
     });
   };
-})(jQuery);
+}
+
+main();
+export default {};

@@ -67,8 +67,15 @@
     width: 100%;
 }
 
-/* === RIGHT PANEL === */
+.fn-gantt .leftPanel .row-list li.draggable {
+    cursor: move;
+}
 
+.fn-gantt .leftPanel .row-list li.draggable:hover {
+    background-color: hsl(0, 0%, 80%);
+}
+
+/* === RIGHT PANEL === */
 .fn-gantt .rightPanel {
     overflow: hidden;
 }
