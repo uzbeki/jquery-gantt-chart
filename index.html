@@ -11,9 +11,11 @@
         <meta name="url" content="https://bekhruz.com">
         <meta name="github" content="https://github.com/uzbeki/jquery-gantt-chart">
         <meta name="npm" content="https://www.npmjs.com/package/@uzbeki/jquery-gantt-chart">
-        <link rel="stylesheet" href="./dist/jquery.gantt.min.css">
         <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
-        <script src="./dist/jquery.gantt.min.js"></script>
+        <!-- <link rel="stylesheet" href="./dist/jquery.gantt.min.css"> -->
+        <!-- <script src="./dist/jquery.gantt.min.js"></script> -->
+        <link rel="stylesheet" href="./src/jquery.gantt.css">
+        <script type="module" src="./src//index.js"></script>
         <title>jQuery Gantt Chart Demo</title>
         <style>
             #gantt {
@@ -44,19 +46,24 @@
         <section>
             <h2>Features</h2>
             <ul>
-                <li>Pagination support, page data handler set inside <code>onGetPage</code> option</li>
-                <li>Customizable cell size with <code>cellSize</code> option</li>
-                <li>Customizable task(bar) colors with <code>data[i].values[j].customClass</code></li>
-                <li>Display short description as hints</li>
-                <li>Scroll with <code>Shift+mouseWheel</code>, or faster scroll with <code>Ctrl+Shift+mouseWheel</code>
+                <li>📟 Pagination support, page data handler set inside <code>onGetPage</code> option</li>
+                <li>👉 Customizable cell size with <code>cellSize</code> option</li>
+                <li>🎨 Customizable task(bar) colors with <code>data[i].values[j].customClass</code></li>
+                <li>🏷️ Display short description as hints</li>
+                <li>🖱️ Scroll with <code>Shift+mouseWheel</code>, or faster scroll with <code>Ctrl+Shift+mouseWheel</code>
                 </li>
-                <li>Mark holidays or today</li>
-                <li>Zoom in/out</li>
+                <li>📅 Mark holidays or today</li>
+                <li>🔍 Zoom in/out</li>
+                <li>🆕 Drag Sortable Header Support (from <code>v0.3.0</code>)</li>
+                <li>🆕 ES Module support (from <code>v0.3.0</code>)</li>
+                <li>🆕 Remember Zoom Level and Header Order (from <code>v0.3.5</code>)</li>
+                <li>🔜 Resizable Bars (coming soon from <code>v0.4.0</code>)</li>
+                <li>🔜 Movable Bars (coming soon from <code>v0.5.0</code>)</li>
             </ul>
             <p>For more, please refer to <a href="https://github.com/uzbeki/jquery-gantt-chart#readme">README file</a>.</p>
         </section>
         
-        <script>
+        <script type='module'>
             /**
              * Generates dummy data for a Gantt chart.
              * @param {number} [page=1] - The page number.

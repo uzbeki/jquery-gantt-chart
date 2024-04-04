@@ -98,7 +98,6 @@ function main() {
       itemsPerPage: 10,
       // localisation
       dow: ["S", "M", "T", "W", "T", "F", "S"],
-      // dow: ["日", "月", "火", "水", "木", "金", "土"],
       months: [
         "January",
         "February",
@@ -113,13 +112,12 @@ function main() {
         "November",
         "December",
       ],
-      // months: ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
       // navigation
       navigate: "scroll", // buttons or scroll
       scrollToToday: true,
-      // cookie options
-      useCookie: false,
-      cookieKey: "jquery-gantt-chart",
+      rememberZoomLevel: true, // remember current zoom level
+      zoomLevelKey: "jquery-gantt-chart-zoom-level",
+      rememberHeaderOrder: true,
       // scale parameters
       scale: "days",
       maxScale: "months",
@@ -129,14 +127,10 @@ function main() {
       onAddClick: (dt, rowId) => {},
       onRender: () => {},
       onGetPage: async page => {},
-      enableOrderSaving: true,
     };
 
     // read options
     $.extend(settings, options);
-
-    // can't use cookie if don't have `$.cookie`
-    settings.useCookie = settings.useCookie && $.isFunction($.cookie);
 
     // Grid management
     // ===============
@@ -144,11 +138,9 @@ function main() {
     // Core object is responsible for navigation and rendering
     var core = {
       // Return the element whose topmost point lies under the given point
-      elementFromPoint: (function () {
-        return function (x, y) {
-          return document.elementFromPoint(x - window.scrollX, y - window.scrollY);
-        };
-      })(),
+      elementFromPoint: function (x, y) {
+        return document.elementFromPoint(x - window.scrollX, y - window.scrollY);
+      },
 
       setData: (element, data) => {
         element.pageNum = data.currentPage;
@@ -161,7 +153,7 @@ function main() {
       },
 
       reOrderData: (data, _newOrder) => {
-        if (!settings.enableOrderSaving || !_newOrder.length) return data;
+        if (!settings.rememberHeaderOrder || !_newOrder.length) return data;
         const newOrder = _newOrder.map(id => parseInt(id.replace("rowheader", "")));
         return data.sort((a, b) => newOrder.indexOf(a.id) - newOrder.indexOf(b.id));
       },
@@ -217,9 +209,9 @@ function main() {
 
         core.fillData(element, $dataPanel, $leftPanel);
 
-        // Set a cookie to record current position in the view
-        if (settings.useCookie) {
-          $.cookie(settings.cookieKey + "ScrollPos");
+        // save the current zoom level to the local storage
+        if (settings.rememberZoomLevel) {
+          localStorage.setItem(settings.zoomLevelKey, settings.scale);
         }
 
         // Scroll the grid to today's date
@@ -232,7 +224,7 @@ function main() {
 
         $dataPanel.css({ height: $leftPanel.height() });
         new DragAndSort(".fn-gantt .leftPanel .row-list", {
-          enableOrderSaving: settings.enableOrderSaving,
+          enableOrderSaving: settings.rememberHeaderOrder,
           onSort: function (order) {
             element.data = core.reOrderData(element.data, order);
             core.render(element);
@@ -952,21 +944,19 @@ function main() {
 
       // **Progress Bar**
       // Return an element representing a progress of position within the entire chart
-      createProgressBar: function (label = "", desc, classNames, dataObj) {
+      createProgressBar: function (day) {
         const l = d => new Date(d).toLocaleString();
-        var bar = $(
-          `<div class="bar" title="${label}" data-bs-content="From ${l(dataObj.from)} to ${l(dataObj.to)}">
-                <div class="fn-label">${label}</div>
-              </div>`
-        ).data("dataObj", dataObj);
+        const bar = $(
+          `<div class="bar" title="${day.label}" data-bs-content="From ${l(day.from)} to ${l(day.to)}">
+            <div class="fn-label">${day.label}</div>
+          </div>`
+        ).data("dataObj", day);
         new Resizer(bar.get(0), { stepSize: settings.cellSize, minWidth: settings.cellSize });
-        bar.on("resize", e => {
-          const newWidth = e.detail.width;
-        });
-        if (classNames) bar.addClass(classNames);
+        bar.on("resize", e => console.log("resize", e.detail));
+        if (day.classNames) bar.addClass(day.classNames);
         bar.on("click", e => {
           e.stopPropagation();
-          settings.onItemClick(dataObj);
+          settings.onItemClick(day);
         });
         return bar;
       },
@@ -976,125 +966,51 @@ function main() {
       fillData: function (element, datapanel, leftpanel /* <- never used? */) {
         var cellWidth = tools.getCellSize();
         var barOffset = (cellWidth - tools.getBarHeight()) / 2;
-        // var dataPanelWidth = datapanel.width();
-        var invertColor = function (colStr) {
-          try {
-            colStr = colStr.replace("rgb(", "").replace(")", "");
-            var rgbArr = colStr.split(",");
-            var R = parseInt(rgbArr[0], 10);
-            var G = parseInt(rgbArr[1], 10);
-            var B = parseInt(rgbArr[2], 10);
-            var gray = Math.round((255 - (0.299 * R + 0.587 * G + 0.114 * B)) * 0.9);
-            return "rgb(" + gray + ", " + gray + ", " + gray + ")";
-          } catch (err) {
-            return "";
-          }
-        };
         // Loop through the values of each data element and set a row
         $.each(element.data, function (i, entry) {
           const headerTopOffset = $(element)
             .find("#rowheader" + entry.id)
             .data("offset");
           $.each(entry.values, function (j, day) {
-            var _bar = core.createProgressBar(day.label, day.desc, day.customClass, day);
-            var from, to, startOffset, endOffset, dFrom, dTo, cellCount, barWidth;
-            let headerCount = 1;
+            const bar = core.createProgressBar(day);
+            let endOffset = 0,
+              cellCount = 1;
+            let headerCount = 1,
+              startOffset = 0,
+              barWidth = 0;
 
             switch (settings.scale) {
               // **Hourly data**
               case "hours":
-                dFrom = tools.genId(tools.dateDeserialize(day.from), element.scaleStep);
-                from = $(element).find("#dh-" + dFrom);
-                dTo = tools.genId(tools.dateDeserialize(day.to), element.scaleStep);
-                to = $(element).find("#dh-" + dTo);
+                const dFrom = tools.genId(tools.dateDeserialize(day.from), element.scaleStep);
+                const from = $(element).find("#dh-" + dFrom);
+                const dTo = tools.genId(tools.dateDeserialize(day.to), element.scaleStep);
+                const to = $(element).find("#dh-" + dTo);
                 startOffset = from.data("offset");
                 endOffset = to.data("offset");
                 cellCount = Math.floor((endOffset - startOffset) / cellWidth) + 1;
-                // dp = (100 * (cellWidth * dl - 1)) / dataPanelWidth;
                 barWidth = cellWidth * cellCount - 1;
-
-                // _bar = core.createProgressBar(day.label, day.desc, day.customClass, day);
-
-                // find row
-                // topEl = $(element).find("#rowheader" + entry.id);
-                // top = cellWidth * 5 + barOffset + topElOffset;
                 headerCount = 5;
-                // _bar.css({
-                //   top: top,
-                //   left: Math.floor(startOffset),
-                //   width: barWidth + "px",
-                // });
-
-                // datapanel.append(_bar);
                 break;
 
               // **Weekly data**
               case "weeks":
-                // dFrom = tools.dateDeserialize(day.from);
-                // dTo = tools.dateDeserialize(day.to);
-
                 startOffset = $(element).find(`#${day.from.getWeekId()}`).data("offset");
                 endOffset = $(element).find(`#${day.to.getWeekId()}`).data("offset");
 
                 cellCount = Math.round((endOffset - startOffset) / cellWidth) + 1;
-                // dp = (100 * (cellWidth * dl - 1)) / dataPanelWidth;
                 barWidth = cellWidth * cellCount;
 
-                // _bar = core.createProgressBar(day.label, day.desc, day.customClass, day);
-                // find row
-                // topEl = $(element).find("#rowheader" + entry.id);
-                // top = cellWidth * 3 + barOffset + topElOffset;
                 headerCount = 3;
-                // _bar.css({
-                //   top: top,
-                //   left: Math.floor(startOffset),
-                //   width: barWidth + "px",
-                // });
-
-                // datapanel.append(_bar);
                 break;
 
               // **Monthly data**
               case "months":
-                // dFrom = tools.dateDeserialize(day.from);
-                // dTo = tools.dateDeserialize(day.to);
-
-                // if (dFrom.getDate() <= 3 && dFrom.getMonth() === 0) {
-                //   dFrom.setDate(dFrom.getDate() + 4);
-                // }
-
-                // if (dFrom.getDate() <= 3 && dFrom.getMonth() === 0) {
-                //   dFrom.setDate(dFrom.getDate() + 4);
-                // }
-
-                // if (dTo.getDate() <= 3 && dTo.getMonth() === 0) {
-                //   dTo.setDate(dTo.getDate() + 4);
-                // }
-
                 startOffset = $(element)
                   .find(`#dh-${getMonthId(day.from)}`)
                   .data("offset");
-                // to = $(element).find("#dh-" + tools.genId(dTo));
-                // to = $(element).find("#dh-" + getMonthId(day.to));
-                // cTo = to.data("offset");
-                // dl = Math.round((cTo - offsetX) / cellWidth) + 1;
-                // dp = (100 * (cellWidth * dl - 1)) / dataPanelWidth;
-                // console.log(day.label, monthsBetween(day.from, day.to), dl);
                 barWidth = cellWidth * monthsBetween(day.from, day.to);
-
-                // _bar = core.createProgressBar(day.label, day.desc, day.customClass, day);
-
-                // find row
-                // topEl = $(element).find("#rowheader" + entry.id);
-                // top = cellWidth * 2 + barOffset + topElOffset;
                 headerCount = 2;
-                // _bar.css({
-                //   top: top,
-                //   left: Math.floor(startOffset),
-                //   width: barWidth + "px",
-                // });
-
-                // datapanel.append(_bar);
                 break;
 
               // **Days**
@@ -1105,33 +1021,15 @@ function main() {
                 startOffset = $(element)
                   .find("#dh-" + tools.genId(day.from))
                   .data("offset");
-                // _bar = core.createProgressBar(day.label, day.desc, day.customClass, day);
-
-                // find row
-                // topEl = $(element).find("#rowheader" + entry.id);
-                // top = cellWidth * 4 + barOffset + topElOffset;
                 headerCount = 4;
-              // _bar.css({
-              //   top: top,
-              //   left: Math.floor(startOffset),
-              //   width: barWidth + "px",
-              // });
-
-              // datapanel.append(_bar);
             }
 
-            _bar.css({
+            bar.css({
               top: cellWidth * headerCount + barOffset + headerTopOffset,
               left: Math.floor(startOffset),
               width: barWidth + "px",
             });
-            datapanel.append(_bar);
-
-            var $l = _bar.find(".fn-label");
-            if ($l.length) {
-              var gray = invertColor(_bar.css("backgroundColor"));
-              $l.css("color", gray);
-            }
+            datapanel.append(bar);
           });
         });
       },
@@ -1229,13 +1127,11 @@ function main() {
         settings.scale = scale;
         element.headerRows = headerRows;
 
-        if (settings.useCookie) {
-          $.cookie(settings.cookieKey + "CurrentScale", settings.scale);
-          // reset scrollPos
-          $.cookie(settings.cookieKey + "ScrollPos", null);
+        // save the new scale to local storage
+        if (settings.rememberZoomLevel) {
+          localStorage.setItem(settings.zoomLevelKey, settings.scale);
         }
         core.init(element);
-        // });
       },
 
       // Move chart via mousewheel
@@ -1529,13 +1425,13 @@ function main() {
       this.dateEnd = null;
       this.headerRows = null;
 
-      // Update cookie with current scale
-      if (settings.useCookie) {
-        var sc = $.cookie(settings.cookieKey + "CurrentScale");
-        if (sc) {
-          settings.scale = sc;
+      // check if local storage has the zoom level saved
+      if (settings.rememberZoomLevel) {
+        const zoomLevel = localStorage.getItem(settings.zoomLevelKey);
+        if (zoomLevel) {
+          settings.scale = zoomLevel;
         } else {
-          $.cookie(settings.cookieKey + "CurrentScale", settings.scale);
+          localStorage.setItem(settings.zoomLevelKey, settings.scale);
         }
       }
 

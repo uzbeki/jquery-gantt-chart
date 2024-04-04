@@ -1,8 +1,11 @@
 {
   "name": "@uzbeki/jquery-gantt-chart",
-  "version": "0.2.2",
   "description": "Simple Gantt Chart implemented with modernJS and jQuery. Previously known as jQuery.Gantt.",
-  "main": "./dist/jquery.gantt.min.js",
+  "homepage": "https://github.com/uzbeki/jquery-gantt-chart#readme",
+  "version": "0.3.0",
+  "type": "module",
+  "main": "./dist/jquery.gantt.js",
+  "module": "./dist/jquery.gantt.js",
   "engines": {
     "node": ">= 10.0.0"
   },
@@ -30,7 +33,6 @@
   "bugs": {
     "url": "https://github.com/uzbeki/jquery-gantt-chart/issues"
   },
-  "homepage": "https://github.com/uzbeki/jquery-gantt-chart#readme",
   "devDependencies": {
     "clean-css-cli": "^5.6.3",
     "terser": "^5.29.2"

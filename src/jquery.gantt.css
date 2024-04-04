@@ -194,34 +194,36 @@
     text-overflow: ellipsis;
     overflow: hidden;
     text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
-    color: #414b57 !important;
+    /* color: #414b57 !important; */
     text-align: center;
     font-size: 11px;
 }
 
 .fn-gantt .ganttRed {
-    background-color: #f9c4e1;
+    background-color: rgb(249, 196, 225);
 }
 
-.fn-gantt .ganttRed .fn-label {
-    color: #78436d !important;
-}
+/* .fn-gantt .ganttRed .fn-label {
+    color: rgb(120, 67, 109) !important;
+} */
 
 .fn-gantt .ganttGreen {
-    background-color: #d8eda3;
+    background-color: rgb(216, 237, 163);
 }
 
-.fn-gantt .ganttGreen .fn-label {
-    color: #778461 !important;
-}
+/* .fn-gantt .ganttGreen .fn-label {
+    color: rgb(119, 132, 97) !important;
+} */
 
 .fn-gantt .ganttOrange {
-    background-color: #fcd29a;
+    background-color: rgb(252, 210, 154);
 }
 
-.fn-gantt .ganttOrange .fn-label {
-    color: #714715 !important;
-}
+/* .fn-gantt .ganttOrange .fn-label {
+    color: rgb(113, 71, 21) !important;
+} */
+
+.fn-gantt .bar .fn-label {}
 
 /* === BOTTOM NAVIGATION === */
 

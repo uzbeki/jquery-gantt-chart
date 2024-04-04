@@ -40,13 +40,18 @@ All major browsers that support ES6 or above.
 
 
 ## Features:
-- 📟Pagination support, page data handler set inside `onGetPage` option
-- Customizable cell size with `cellSize` option
+- 📟 Pagination support, page data handler set inside `onGetPage` option
+- 👉 Customizable cell size with `cellSize` option
 - 🎨 Customizable task(bar) colors with `data[i].values[j].customClass`
-- ℹ️ Display short description as hints
+- 🏷️ Display short description as hints
 - 🖱️ Scroll with `Shift+mouseWheel`, or faster scroll with `Ctrl+Shift+mouseWheel`
 - 📅 Mark holidays or today
 - 🔍 Zoom in/out
+- 🆕 Drag Sortable Header Support (from v0.3.0)
+- 🆕 ES Module support (from v0.3.0)
+- 🆕 Remember Zoom Level and Header Order (page by page remembering) (from v0.3.5)
+- 🔜 Resizable Bars (coming soon from v0.4.0)
+- 🔜 Movable Bars (coming soon from v0.5.0)
 
 ## Requirements:
 - jQuery v1.10.2 or above:
@@ -86,8 +91,9 @@ $("#gantt").gantt({
 - `source` - json data, defaults to `{}`
 - `navigate` - navigation type (buttons, scroll), defaults to `scroll`
 - `scrollToToday` - scroll to today, defaults to `true`
-- `cookieKey` - cookie key, defaults to `jquery-gantt-chart`
-- `useCookie` - use cookie to save last view, defaults to `false`
+- `zoomLevelKey` - key to save zoom level, defaults to `jquery-gantt-chart-zoom-level`
+- `rememberZoomLevel` - remember current zoom level, defaults to `true`
+- `rememberHeaderOrder` - remember header order, defaults to `true`
 - `scale` - scale type (hours, days, weeks, months), defaults to `days`
 - `maxScale` - maximum scale, defaults to `months`
 - `minScale` - minimum scale, defaults to `hours`
