@@ -2,6 +2,7 @@
     width: 100%;
     --cell-size: 24px;
     --header-color: #f6f6f6;
+    --bar-height: 18px;
 }
 
 .fn-label {
@@ -172,8 +173,8 @@
 
 .fn-gantt .bar {
     background-color: #d0e4fd;
-    height: 18px;
-    margin: 0 3px 3px 0;
+    height: var(--bar-height);
+    /* margin: 0 3px 3px 0; */
     position: absolute;
     z-index: 10;
     text-align: center;
@@ -186,7 +187,7 @@
 }
 
 .fn-gantt .bar .fn-label {
-    line-height: 18px;
+    line-height: var(--bar-height);
     font-weight: bold;
     white-space: nowrap;
     width: 100%;

@@ -8,6 +8,8 @@
  */
 
 import DragAndSort, { getOrder } from "./helpers/index.js";
+import Resizer from "./helpers/Resizer.js";
+import { daysBetween, monthsBetween, getMonthId } from "./helpers/utils.js";
 
 function main() {
   "use strict";
@@ -205,6 +207,7 @@ function main() {
 
         element.gantt = $('<div class="fn-gantt" />').append(content);
         element.gantt.get(0).style.setProperty("--cell-size", tools.getCellSize() + "px");
+        element.gantt.get(0).style.setProperty("--bar-height", tools.getCellSize() * 0.8 + "px");
 
         $(element).empty().append(element.gantt);
 
@@ -956,9 +959,11 @@ function main() {
                 <div class="fn-label">${label}</div>
               </div>`
         ).data("dataObj", dataObj);
-        if (classNames) {
-          bar.addClass(classNames);
-        }
+        new Resizer(bar.get(0), { stepSize: settings.cellSize, minWidth: settings.cellSize });
+        bar.on("resize", e => {
+          const newWidth = e.detail.width;
+        });
+        if (classNames) bar.addClass(classNames);
         bar.on("click", e => {
           e.stopPropagation();
           settings.onItemClick(dataObj);
@@ -970,8 +975,8 @@ function main() {
       // Parse the data and fill the data panel
       fillData: function (element, datapanel, leftpanel /* <- never used? */) {
         var cellWidth = tools.getCellSize();
-        var barOffset = (cellWidth - 18) / 2;
-        var dataPanelWidth = datapanel.width();
+        var barOffset = (cellWidth - tools.getBarHeight()) / 2;
+        // var dataPanelWidth = datapanel.width();
         var invertColor = function (colStr) {
           try {
             colStr = colStr.replace("rgb(", "").replace(")", "");
@@ -987,10 +992,13 @@ function main() {
         };
         // Loop through the values of each data element and set a row
         $.each(element.data, function (i, entry) {
+          const headerTopOffset = $(element)
+            .find("#rowheader" + entry.id)
+            .data("offset");
           $.each(entry.values, function (j, day) {
-            var _bar;
-            var from, to, cFrom, cTo, dFrom, dTo, dl, dp;
-            var topEl, top;
+            var _bar = core.createProgressBar(day.label, day.desc, day.customClass, day);
+            var from, to, startOffset, endOffset, dFrom, dTo, cellCount, barWidth;
+            let headerCount = 1;
 
             switch (settings.scale) {
               // **Hourly data**
@@ -999,113 +1007,125 @@ function main() {
                 from = $(element).find("#dh-" + dFrom);
                 dTo = tools.genId(tools.dateDeserialize(day.to), element.scaleStep);
                 to = $(element).find("#dh-" + dTo);
-                cFrom = from.data("offset");
-                cTo = to.data("offset");
-                dl = Math.floor((cTo - cFrom) / cellWidth) + 1;
-                dp = (100 * (cellWidth * dl - 1)) / dataPanelWidth;
+                startOffset = from.data("offset");
+                endOffset = to.data("offset");
+                cellCount = Math.floor((endOffset - startOffset) / cellWidth) + 1;
+                // dp = (100 * (cellWidth * dl - 1)) / dataPanelWidth;
+                barWidth = cellWidth * cellCount - 1;
 
-                _bar = core.createProgressBar(day.label, day.desc, day.customClass, day);
+                // _bar = core.createProgressBar(day.label, day.desc, day.customClass, day);
 
                 // find row
-                topEl = $(element).find("#rowheader" + entry.id);
-                top = cellWidth * 5 + barOffset + topEl.data("offset");
-                _bar.css({
-                  top: top,
-                  left: Math.floor(cFrom),
-                  width: dp + "%",
-                });
+                // topEl = $(element).find("#rowheader" + entry.id);
+                // top = cellWidth * 5 + barOffset + topElOffset;
+                headerCount = 5;
+                // _bar.css({
+                //   top: top,
+                //   left: Math.floor(startOffset),
+                //   width: barWidth + "px",
+                // });
 
-                datapanel.append(_bar);
+                // datapanel.append(_bar);
                 break;
 
               // **Weekly data**
               case "weeks":
-                dFrom = tools.dateDeserialize(day.from);
-                dTo = tools.dateDeserialize(day.to);
+                // dFrom = tools.dateDeserialize(day.from);
+                // dTo = tools.dateDeserialize(day.to);
 
-                from = $(element).find("#" + dFrom.getWeekId());
-                cFrom = from.data("offset");
-                to = $(element).find("#" + dTo.getWeekId());
-                cTo = to.data("offset");
-                dl = Math.round((cTo - cFrom) / cellWidth) + 1;
-                dp = (100 * (cellWidth * dl - 1)) / dataPanelWidth;
+                startOffset = $(element).find(`#${day.from.getWeekId()}`).data("offset");
+                endOffset = $(element).find(`#${day.to.getWeekId()}`).data("offset");
 
-                _bar = core.createProgressBar(day.label, day.desc, day.customClass, day);
+                cellCount = Math.round((endOffset - startOffset) / cellWidth) + 1;
+                // dp = (100 * (cellWidth * dl - 1)) / dataPanelWidth;
+                barWidth = cellWidth * cellCount;
 
+                // _bar = core.createProgressBar(day.label, day.desc, day.customClass, day);
                 // find row
-                topEl = $(element).find("#rowheader" + entry.id);
-                top = cellWidth * 3 + barOffset + topEl.data("offset");
-                _bar.css({
-                  top: top,
-                  left: Math.floor(cFrom),
-                  width: dp + "%",
-                });
+                // topEl = $(element).find("#rowheader" + entry.id);
+                // top = cellWidth * 3 + barOffset + topElOffset;
+                headerCount = 3;
+                // _bar.css({
+                //   top: top,
+                //   left: Math.floor(startOffset),
+                //   width: barWidth + "px",
+                // });
 
-                datapanel.append(_bar);
+                // datapanel.append(_bar);
                 break;
 
               // **Monthly data**
               case "months":
-                dFrom = tools.dateDeserialize(day.from);
-                dTo = tools.dateDeserialize(day.to);
+                // dFrom = tools.dateDeserialize(day.from);
+                // dTo = tools.dateDeserialize(day.to);
 
-                if (dFrom.getDate() <= 3 && dFrom.getMonth() === 0) {
-                  dFrom.setDate(dFrom.getDate() + 4);
-                }
+                // if (dFrom.getDate() <= 3 && dFrom.getMonth() === 0) {
+                //   dFrom.setDate(dFrom.getDate() + 4);
+                // }
 
-                if (dFrom.getDate() <= 3 && dFrom.getMonth() === 0) {
-                  dFrom.setDate(dFrom.getDate() + 4);
-                }
+                // if (dFrom.getDate() <= 3 && dFrom.getMonth() === 0) {
+                //   dFrom.setDate(dFrom.getDate() + 4);
+                // }
 
-                if (dTo.getDate() <= 3 && dTo.getMonth() === 0) {
-                  dTo.setDate(dTo.getDate() + 4);
-                }
+                // if (dTo.getDate() <= 3 && dTo.getMonth() === 0) {
+                //   dTo.setDate(dTo.getDate() + 4);
+                // }
 
-                from = $(element).find("#dh-" + tools.genId(dFrom));
-                cFrom = from.data("offset");
-                to = $(element).find("#dh-" + tools.genId(dTo));
-                cTo = to.data("offset");
-                dl = Math.round((cTo - cFrom) / cellWidth) + 1;
-                dp = (100 * (cellWidth * dl - 1)) / dataPanelWidth;
+                startOffset = $(element)
+                  .find(`#dh-${getMonthId(day.from)}`)
+                  .data("offset");
+                // to = $(element).find("#dh-" + tools.genId(dTo));
+                // to = $(element).find("#dh-" + getMonthId(day.to));
+                // cTo = to.data("offset");
+                // dl = Math.round((cTo - offsetX) / cellWidth) + 1;
+                // dp = (100 * (cellWidth * dl - 1)) / dataPanelWidth;
+                // console.log(day.label, monthsBetween(day.from, day.to), dl);
+                barWidth = cellWidth * monthsBetween(day.from, day.to);
 
-                _bar = core.createProgressBar(day.label, day.desc, day.customClass, day);
+                // _bar = core.createProgressBar(day.label, day.desc, day.customClass, day);
 
                 // find row
-                topEl = $(element).find("#rowheader" + entry.id);
-                top = cellWidth * 2 + barOffset + topEl.data("offset");
-                _bar.css({
-                  top: top,
-                  left: Math.floor(cFrom),
-                  width: dp + "%",
-                });
+                // topEl = $(element).find("#rowheader" + entry.id);
+                // top = cellWidth * 2 + barOffset + topElOffset;
+                headerCount = 2;
+                // _bar.css({
+                //   top: top,
+                //   left: Math.floor(startOffset),
+                //   width: barWidth + "px",
+                // });
 
-                datapanel.append(_bar);
+                // datapanel.append(_bar);
                 break;
 
               // **Days**
               case "days":
               /* falls through */
               default:
-                dFrom = tools.genId(tools.dateDeserialize(day.from));
-                dTo = tools.genId(tools.dateDeserialize(day.to));
-                from = $(element).find("#dh-" + dFrom);
-                cFrom = from.data("offset");
-                dl = Math.round((dTo - dFrom) / UTC_DAY_IN_MS) + 1;
-                dp = (100 * (cellWidth * dl - 1)) / dataPanelWidth;
-
-                _bar = core.createProgressBar(day.label, day.desc, day.customClass, day);
+                barWidth = cellWidth * daysBetween(day.from, day.to);
+                startOffset = $(element)
+                  .find("#dh-" + tools.genId(day.from))
+                  .data("offset");
+                // _bar = core.createProgressBar(day.label, day.desc, day.customClass, day);
 
                 // find row
-                topEl = $(element).find("#rowheader" + entry.id);
-                top = cellWidth * 4 + barOffset + topEl.data("offset");
-                _bar.css({
-                  top: top,
-                  left: Math.floor(cFrom),
-                  width: dp + "%",
-                });
+                // topEl = $(element).find("#rowheader" + entry.id);
+                // top = cellWidth * 4 + barOffset + topElOffset;
+                headerCount = 4;
+              // _bar.css({
+              //   top: top,
+              //   left: Math.floor(startOffset),
+              //   width: barWidth + "px",
+              // });
 
-                datapanel.append(_bar);
+              // datapanel.append(_bar);
             }
+
+            _bar.css({
+              top: cellWidth * headerCount + barOffset + headerTopOffset,
+              left: Math.floor(startOffset),
+              width: barWidth + "px",
+            });
+            datapanel.append(_bar);
 
             var $l = _bar.find(".fn-label");
             if ($l.length) {
@@ -1479,6 +1499,10 @@ function main() {
       // Get the current cell height
       getCellSize: function () {
         return settings.cellSize;
+      },
+
+      getBarHeight: function () {
+        return tools.getCellSize() * 0.8;
       },
 
       // Get the current page height
