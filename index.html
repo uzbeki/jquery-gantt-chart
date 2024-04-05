@@ -50,7 +50,8 @@
                 <li>👉 Customizable cell size with <code>cellSize</code> option</li>
                 <li>🎨 Customizable task(bar) colors with <code>data[i].values[j].customClass</code></li>
                 <li>🏷️ Display short description as hints</li>
-                <li>🖱️ Scroll with <code>Shift+mouseWheel</code>, or faster scroll with <code>Ctrl+Shift+mouseWheel</code>
+                <li>🖱️ Scroll with <code>Shift+mouseWheel</code>, or faster scroll with
+                    <code>Ctrl+Shift+mouseWheel</code>
                 </li>
                 <li>📅 Mark holidays or today</li>
                 <li>🔍 Zoom in/out</li>
@@ -60,9 +61,10 @@
                 <li>🔜 Resizable Bars (coming soon from <code>v0.4.0</code>)</li>
                 <li>🔜 Movable Bars (coming soon from <code>v0.5.0</code>)</li>
             </ul>
-            <p>For more, please refer to <a href="https://github.com/uzbeki/jquery-gantt-chart#readme">README file</a>.</p>
+            <p>For more, please refer to <a href="https://github.com/uzbeki/jquery-gantt-chart#readme">README file</a>.
+            </p>
         </section>
-        
+
         <script type='module'>
             /**
              * Generates dummy data for a Gantt chart.
@@ -86,40 +88,329 @@
              * }>} The generated dummy data.
              */
             const generateDummyData = async (page = 1) => {
-                const generateRandomNumber = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
-                const totalPages = 10;
-                const itemsPerPage = 10;
-                if (page > totalPages) {
-                    return { data: [], currentPage: page, pageCount: totalPages, itemsPerPage: 10 };
-                }
-                const data = [];
-                for (let i = 1; i <= itemsPerPage; i++) {
-                    const values = Array.from({ length: generateRandomNumber(1, 100) }, (_, j) => {
-                        const thisYear = generateRandomNumber(2024, 2025);
-                        const randomMonth = generateRandomNumber(1, 12);
-                        const randomFrom = new Date(thisYear, randomMonth, generateRandomNumber(1, 10) + j + page * 10);
-                        const randomTo = new Date(thisYear, randomMonth, generateRandomNumber(10, 25) + j + page * 10);
+                // const generateRandomNumber = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
+                // const totalPages = 1;
+                // const itemsPerPage = 10;
+                // if (page > totalPages) {
+                //     return { data: [], currentPage: page, pageCount: totalPages, itemsPerPage: 10 };
+                // }
+                // const data = [];
+                // for (let i = 1; i <= itemsPerPage; i++) {
+                //     // const values = Array.from({ length: generateRandomNumber(1, 100) }, (_, j) => {
+                //     const values = Array.from({ length: 3 }, (_, j) => {
+                //         const thisYear = generateRandomNumber(2024, 2025);
+                //         const randomMonth = generateRandomNumber(1, 12);
+                //         const randomFrom = new Date(thisYear, randomMonth, generateRandomNumber(1, 10) + j + page * 10);
+                //         const randomTo = new Date(thisYear, randomMonth, generateRandomNumber(10, 25) + j + page * 10);
 
-                        return {
-                            from: randomFrom,
-                            to: randomTo,
-                            label: `Task ${j}`,
-                            desc: `Task ${j} description`,
-                            customClass: "ganttRed",
-                        };
-                    });
+                //         return {
+                //             from: randomFrom,
+                //             to: randomTo,
+                //             label: `Task ${j}`,
+                //             desc: `Task ${j} description`,
+                //             customClass: "ganttRed",
+                //         };
+                //     });
 
-                    data.push({
-                        id: i,
-                        name: `Sprint ${i}`,
-                        desc: `Description ${i}`,
-                        values,
-                    });
+                //     data.push({
+                //         id: i,
+                //         name: `Sprint ${i}`,
+                //         desc: `Description ${i}`,
+                //         values,
+                //     });
+                // }
+                // return { data, currentPage: page, pageCount: totalPages, itemsPerPage: itemsPerPage };
+                return {
+                    "data": [
+                        {
+                            "id": 1,
+                            "name": "Sprint 1",
+                            "desc": "Description 1",
+                            "values": [
+                                {
+                                    "from": new Date("2025-04-12T15:00:00.000Z"),
+                                    "to": new Date("2025-04-28T15:00:00.000Z"),
+                                    "label": "Task 0",
+                                    "desc": "Task 0 description",
+                                    "customClass": "ganttRed"
+                                },
+                                {
+                                    "from": new Date("2025-09-12T15:00:00.000Z"),
+                                    "to": new Date("2025-09-30T15:00:00.000Z"),
+                                    "label": "Task 1",
+                                    "desc": "Task 1 description",
+                                    "customClass": "ganttRed"
+                                },
+                                {
+                                    "from": new Date("2025-08-17T15:00:00.000Z"),
+                                    "to": new Date("2025-08-25T15:00:00.000Z"),
+                                    "label": "Task 2",
+                                    "desc": "Task 2 description",
+                                    "customClass": "ganttRed"
+                                }
+                            ]
+                        },
+                        {
+                            "id": 2,
+                            "name": "Sprint 2",
+                            "desc": "Description 2",
+                            "values": [
+                                {
+                                    "from": new Date("2025-10-16T15:00:00.000Z"),
+                                    "to": new Date("2025-11-02T15:00:00.000Z"),
+                                    "label": "Task 0",
+                                    "desc": "Task 0 description",
+                                    "customClass": "ganttRed"
+                                },
+                                {
+                                    "from": new Date("2024-08-14T15:00:00.000Z"),
+                                    "to": new Date("2024-08-22T15:00:00.000Z"),
+                                    "label": "Task 1",
+                                    "desc": "Task 1 description",
+                                    "customClass": "ganttRed"
+                                },
+                                {
+                                    "from": new Date("2025-02-19T15:00:00.000Z"),
+                                    "to": new Date("2025-03-03T15:00:00.000Z"),
+                                    "label": "Task 2",
+                                    "desc": "Task 2 description",
+                                    "customClass": "ganttRed"
+                                }
+                            ]
+                        },
+                        {
+                            "id": 3,
+                            "name": "Sprint 3",
+                            "desc": "Description 3",
+                            "values": [
+                                {
+                                    "from": new Date("2025-04-15T15:00:00.000Z"),
+                                    "to": new Date("2025-04-22T15:00:00.000Z"),
+                                    "label": "Task 0",
+                                    "desc": "Task 0 description",
+                                    "customClass": "ganttRed"
+                                },
+                                {
+                                    "from": new Date("2026-01-12T15:00:00.000Z"),
+                                    "to": new Date("2026-01-24T15:00:00.000Z"),
+                                    "label": "Task 1",
+                                    "desc": "Task 1 description",
+                                    "customClass": "ganttRed"
+                                },
+                                {
+                                    "from": new Date("2024-02-16T15:00:00.000Z"),
+                                    "to": new Date("2024-02-23T15:00:00.000Z"),
+                                    "label": "Task 2",
+                                    "desc": "Task 2 description",
+                                    "customClass": "ganttRed"
+                                }
+                            ]
+                        },
+                        {
+                            "id": 4,
+                            "name": "Sprint 4",
+                            "desc": "Description 4",
+                            "values": [
+                                {
+                                    "from": new Date("2024-05-14T15:00:00.000Z"),
+                                    "to": new Date("2024-05-30T15:00:00.000Z"),
+                                    "label": "Task 0",
+                                    "desc": "Task 0 description",
+                                    "customClass": "ganttRed"
+                                },
+                                {
+                                    "from": new Date("2024-03-16T15:00:00.000Z"),
+                                    "to": new Date("2024-04-01T15:00:00.000Z"),
+                                    "label": "Task 1",
+                                    "desc": "Task 1 description",
+                                    "customClass": "ganttRed"
+                                },
+                                {
+                                    "from": new Date("2025-02-18T15:00:00.000Z"),
+                                    "to": new Date("2025-03-07T15:00:00.000Z"),
+                                    "label": "Task 2",
+                                    "desc": "Task 2 description",
+                                    "customClass": "ganttRed"
+                                }
+                            ]
+                        },
+                        {
+                            "id": 5,
+                            "name": "Sprint 5",
+                            "desc": "Description 5",
+                            "values": [
+                                {
+                                    "from": new Date("2026-01-12T15:00:00.000Z"),
+                                    "to": new Date("2026-01-25T15:00:00.000Z"),
+                                    "label": "Task 0",
+                                    "desc": "Task 0 description",
+                                    "customClass": "ganttRed"
+                                },
+                                {
+                                    "from": new Date("2025-11-13T15:00:00.000Z"),
+                                    "to": new Date("2025-11-24T15:00:00.000Z"),
+                                    "label": "Task 1",
+                                    "desc": "Task 1 description",
+                                    "customClass": "ganttRed"
+                                },
+                                {
+                                    "from": new Date("2025-08-15T15:00:00.000Z"),
+                                    "to": new Date("2025-08-30T15:00:00.000Z"),
+                                    "label": "Task 2",
+                                    "desc": "Task 2 description",
+                                    "customClass": "ganttRed"
+                                }
+                            ]
+                        },
+                        {
+                            "id": 6,
+                            "name": "Sprint 6",
+                            "desc": "Description 6",
+                            "values": [
+                                {
+                                    "from": new Date("2024-08-11T15:00:00.000Z"),
+                                    "to": new Date("2024-08-31T15:00:00.000Z"),
+                                    "label": "Task 0",
+                                    "desc": "Task 0 description",
+                                    "customClass": "ganttRed"
+                                },
+                                {
+                                    "from": new Date("2025-08-18T15:00:00.000Z"),
+                                    "to": new Date("2025-08-29T15:00:00.000Z"),
+                                    "label": "Task 1",
+                                    "desc": "Task 1 description",
+                                    "customClass": "ganttRed"
+                                },
+                                {
+                                    "from": new Date("2025-06-13T15:00:00.000Z"),
+                                    "to": new Date("2025-06-28T15:00:00.000Z"),
+                                    "label": "Task 2",
+                                    "desc": "Task 2 description",
+                                    "customClass": "ganttRed"
+                                }
+                            ]
+                        },
+                        {
+                            "id": 7,
+                            "name": "Sprint 7",
+                            "desc": "Description 7",
+                            "values": [
+                                {
+                                    "from": new Date("2024-07-13T15:00:00.000Z"),
+                                    "to": new Date("2024-07-21T15:00:00.000Z"),
+                                    "label": "Task 0",
+                                    "desc": "Task 0 description",
+                                    "customClass": "ganttRed"
+                                },
+                                {
+                                    "from": new Date("2025-04-19T15:00:00.000Z"),
+                                    "to": new Date("2025-04-26T15:00:00.000Z"),
+                                    "label": "Task 1",
+                                    "desc": "Task 1 description",
+                                    "customClass": "ganttRed"
+                                },
+                                {
+                                    "from": new Date("2024-07-19T15:00:00.000Z"),
+                                    "to": new Date("2024-07-23T15:00:00.000Z"),
+                                    "label": "Task 2",
+                                    "desc": "Task 2 description",
+                                    "customClass": "ganttRed"
+                                }
+                            ]
+                        },
+                        {
+                            "id": 8,
+                            "name": "Sprint 8",
+                            "desc": "Description 8",
+                            "values": [
+                                {
+                                    "from": new Date("2024-06-18T15:00:00.000Z"),
+                                    "to": new Date("2024-06-20T15:00:00.000Z"),
+                                    "label": "Task 0",
+                                    "desc": "Task 0 description",
+                                    "customClass": "ganttRed"
+                                },
+                                {
+                                    "from": new Date("2025-08-14T15:00:00.000Z"),
+                                    "to": new Date("2025-08-31T15:00:00.000Z"),
+                                    "label": "Task 1",
+                                    "desc": "Task 1 description",
+                                    "customClass": "ganttRed"
+                                },
+                                {
+                                    "from": new Date("2025-10-13T15:00:00.000Z"),
+                                    "to": new Date("2025-10-31T15:00:00.000Z"),
+                                    "label": "Task 2",
+                                    "desc": "Task 2 description",
+                                    "customClass": "ganttRed"
+                                }
+                            ]
+                        },
+                        {
+                            "id": 9,
+                            "name": "Sprint 9",
+                            "desc": "Description 9",
+                            "values": [
+                                {
+                                    "from": new Date("2025-10-10T15:00:00.000Z"),
+                                    "to": new Date("2025-10-20T15:00:00.000Z"),
+                                    "label": "Task 0",
+                                    "desc": "Task 0 description",
+                                    "customClass": "ganttRed"
+                                },
+                                {
+                                    "from": new Date("2025-04-17T15:00:00.000Z"),
+                                    "to": new Date("2025-04-26T15:00:00.000Z"),
+                                    "label": "Task 1",
+                                    "desc": "Task 1 description",
+                                    "customClass": "ganttRed"
+                                },
+                                {
+                                    "from": new Date("2025-03-18T15:00:00.000Z"),
+                                    "to": new Date("2025-03-31T15:00:00.000Z"),
+                                    "label": "Task 2",
+                                    "desc": "Task 2 description",
+                                    "customClass": "ganttRed"
+                                }
+                            ]
+                        },
+                        {
+                            "id": 10,
+                            "name": "Sprint 10",
+                            "desc": "Description 10",
+                            "values": [
+                                {
+                                    "from": new Date("2025-09-15T15:00:00.000Z"),
+                                    "to": new Date("2025-10-01T15:00:00.000Z"),
+                                    "label": "Task 0",
+                                    "desc": "Task 0 description",
+                                    "customClass": "ganttRed"
+                                },
+                                {
+                                    "from": new Date("2025-10-16T15:00:00.000Z"),
+                                    "to": new Date("2025-10-30T15:00:00.000Z"),
+                                    "label": "Task 1",
+                                    "desc": "Task 1 description",
+                                    "customClass": "ganttRed"
+                                },
+                                {
+                                    "from": new Date("2026-01-18T15:00:00.000Z"),
+                                    "to": new Date("2026-02-03T15:00:00.000Z"),
+                                    "label": "Task 2",
+                                    "desc": "Task 2 description",
+                                    "customClass": "ganttRed"
+                                }
+                            ]
+                        }
+                    ],
+                    "currentPage": 1,
+                    "pageCount": 1,
+                    "itemsPerPage": 10
                 }
-                return { data, currentPage: page, pageCount: totalPages, itemsPerPage: itemsPerPage };
             };
 
             generateDummyData(1).then(data => {
+                console.log(data);
                 $("#gantt").gantt({
                     source: data,
                     navigate: "scroll", // buttons, scroll

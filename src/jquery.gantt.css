@@ -8,6 +8,7 @@
 .fn-label {
     overflow: hidden;
     text-overflow: ellipsis;
+    user-select: none;
 }
 
 .fn-gantt *,
@@ -229,8 +230,6 @@
 /* .fn-gantt .ganttOrange .fn-label {
     color: rgb(113, 71, 21) !important;
 } */
-
-.fn-gantt .bar .fn-label {}
 
 /* === BOTTOM NAVIGATION === */
 

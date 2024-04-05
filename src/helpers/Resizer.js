@@ -5,6 +5,8 @@
  * @property {Function} [onResize=(newWidth) => {}] - The callback function to be called when the element is resized.
  * @property {number} [stepSize=1] - The step size for resizing the element.
  * @property {string} [handleVisibility="hover"] - The visibility of the resize handles. Possible values: "hover" | "click" | "always".
+ * @property {boolean} [leftHandle=false] - Whether to show the left handle.
+ * @property {boolean} [rightHandle=true] - Whether to show the right handle.
  */
 const initialOptions = {
   minWidth: 10,
@@ -12,6 +14,8 @@ const initialOptions = {
   onResize: newWidth => {},
   stepSize: 1,
   handleVisibility: "hover", // "hover" | "click" | "always"
+  leftHandle: false,
+  rightHandle: true
 };
 
 class Resizer {
@@ -41,24 +45,24 @@ class Resizer {
    * Initializes the Resizer by creating left and right handles and attaching event listeners.
    */
   initialize() {
-    this.leftHandle = document.createElement("div");
-    this.leftHandle.classList.add("resizer-handle", "left-handle");
-    this.rightHandle = document.createElement("div");
-    this.rightHandle.classList.add("resizer-handle", "right-handle");
+    const createHandle = (handleClass) => {
+      const handle = document.createElement("div");
+      handle.classList.add("resizer-handle", handleClass);
+      this.element.appendChild(handle);
+      handle.addEventListener("mousedown", this.startResize);
+      handle.addEventListener("touchstart", this.startResize);
+      return handle;
+    };
+
+    if (this.options.leftHandle) {
+      this.leftHandle = createHandle("left-handle");
+    }
+
+    if (this.options.rightHandle) {
+      this.rightHandle = createHandle("right-handle");
+    }
+
     this.__handleVisibility();
-
-    this.element.appendChild(this.leftHandle);
-    this.element.appendChild(this.rightHandle);
-
-    // this.element.style.position = "relative";
-
-    // Add event listeners for mouse events
-    this.leftHandle.addEventListener("mousedown", this.startResize);
-    this.rightHandle.addEventListener("mousedown", this.startResize);
-
-    // Add event listeners for touch events
-    this.leftHandle.addEventListener("touchstart", this.startResize);
-    this.rightHandle.addEventListener("touchstart", this.startResize);
   }
 
   /**
@@ -119,7 +123,7 @@ class Resizer {
     return parseInt(getComputedStyle(this.element).width, 10);
   }
 
-  __getHandles = () => [this.leftHandle, this.rightHandle];
+  __getHandles = () => [this.leftHandle, this.rightHandle].filter(Boolean);
   __showHandles = () => {
     if (this.element.classList.contains("resizing")) return;
     this.__getHandles().forEach(handle => handle.classList.remove("hidden"));

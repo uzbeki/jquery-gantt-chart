@@ -7,9 +7,11 @@
  * @link https://github.com/uzbeki/jquery-gantt-chart/
  */
 
-import DragAndSort, { getOrder } from "./helpers/index.js";
+import Movable from "./helpers/Movable.js";
 import Resizer from "./helpers/Resizer.js";
-import { daysBetween, monthsBetween, getMonthId } from "./helpers/utils.js";
+import DragAndSort, { getOrder } from "./helpers/index.js";
+import { initialSettings } from "./helpers/initials.js";
+import { adjustDate, daysBetween, getMonthId, monthsBetween } from "./helpers/utils.js";
 
 function main() {
   "use strict";
@@ -90,45 +92,7 @@ function main() {
   $.fn.gantt = function (options) {
     var scales = ["hours", "days", "weeks", "months"];
     //Default settings
-    var settings = {
-      cellSize: 24, // cell size for the gantt chart
-      source: {},
-      holidays: [],
-      // paging
-      itemsPerPage: 10,
-      // localisation
-      dow: ["S", "M", "T", "W", "T", "F", "S"],
-      months: [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December",
-      ],
-      // navigation
-      navigate: "scroll", // buttons or scroll
-      scrollToToday: true,
-      rememberZoomLevel: true, // remember current zoom level
-      zoomLevelKey: "jquery-gantt-chart-zoom-level",
-      rememberHeaderOrder: true,
-      // scale parameters
-      scale: "days",
-      maxScale: "months",
-      minScale: "hours",
-      // callbacks
-      onItemClick: data => {},
-      onAddClick: (dt, rowId) => {},
-      onRender: () => {},
-      onGetPage: async page => {},
-    };
-
+    var settings = initialSettings;
     // read options
     $.extend(settings, options);
 
@@ -952,11 +916,15 @@ function main() {
           </div>`
         ).data("dataObj", day);
         new Resizer(bar.get(0), { stepSize: settings.cellSize, minWidth: settings.cellSize });
-        bar.on("resize", e => console.log("resize", e.detail));
+        new Movable(bar.get(0), { stepSize: settings.cellSize });
+        // bar.on("resize", e => {
+        //   console.log("Resized", e.detail.width, day.label);
+        //   settings.onBarResize(day, e.detail.width);
+        // });
         if (day.classNames) bar.addClass(day.classNames);
         bar.on("click", e => {
           e.stopPropagation();
-          settings.onItemClick(day);
+          settings.onItemClick(bar.data("dataObj"));
         });
         return bar;
       },
@@ -1009,7 +977,8 @@ function main() {
                 startOffset = $(element)
                   .find(`#dh-${getMonthId(day.from)}`)
                   .data("offset");
-                barWidth = cellWidth * monthsBetween(day.from, day.to);
+                cellCount = monthsBetween(day.from, day.to);
+                barWidth = cellWidth * cellCount;
                 headerCount = 2;
                 break;
 
@@ -1017,7 +986,8 @@ function main() {
               case "days":
               /* falls through */
               default:
-                barWidth = cellWidth * daysBetween(day.from, day.to);
+                cellCount = daysBetween(day.from, day.to);
+                barWidth = cellWidth * cellCount;
                 startOffset = $(element)
                   .find("#dh-" + tools.genId(day.from))
                   .data("offset");
@@ -1030,6 +1000,15 @@ function main() {
               width: barWidth + "px",
             });
             datapanel.append(bar);
+
+            bar.on("resize", e => {
+              const dataObj = bar.data("dataObj");
+              settings.onBarResize(dataObj, e.detail.width);
+              const cellsChanged = e.detail.delta / cellWidth;
+              const resizedDay = { ...dataObj, to: adjustDate(dataObj.to, cellsChanged, settings.scale) };
+              bar.data("dataObj", resizedDay);
+              element.data[i].values[j] = resizedDay;
+            });
           });
         });
       },
