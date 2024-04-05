@@ -184,6 +184,13 @@
     -webkit-border-radius: 3px;
     -moz-border-radius: 3px;
     border-radius: 3px;
+    --resizer-color: hsl(0, 0%, 40%);
+}
+
+.fn-gantt .bar.resizing {
+    z-index: 100;
+    border: 1px solid var(--resizer-color);
+    border-style: dashed;
 }
 
 .fn-gantt .bar .fn-label {
@@ -439,4 +446,27 @@
     transform: translateY(-50%) scale(1.1);
     transition: none;
     cursor: grabbing;
+}
+
+.fn-gantt .bar .resizer-handle {
+    position: absolute;
+    top: 0;
+    width: 8px;
+    height: 100%;
+    background-color: var(--resizer-color);
+    cursor: w-resize;
+    transition: all 0.1s ease;
+}
+
+
+.fn-gantt .bar .left-handle {
+    left: 0;
+}
+
+.fn-gantt .bar .right-handle {
+    right: 0;
+}
+
+.fn-gantt .bar:not(.resizing) .resizer-handle.hidden {
+    width: 0;
 }
