@@ -47,11 +47,12 @@ All major browsers that support ES6 or above.
 - 🖱️ Scroll with `Shift+mouseWheel`, or faster scroll with `Ctrl+Shift+mouseWheel`
 - 📅 Mark holidays or today
 - 🔍 Zoom in/out
-- 🆕 Drag Sortable Header Support (from v0.3.0)
-- 🆕 ES Module support (from v0.3.0)
-- 🆕 Remember Zoom Level and Header Order (page by page remembering) (from v0.3.5)
-- 🔜 Resizable Bars (coming soon from v0.4.0)
-- 🔜 Movable Bars (coming soon from v0.5.0)
+- Drag Sortable Header Support
+- 🆕 ES Module support
+- 🆕 Remember Zoom Level and Header Order (page by page remembering)
+- 🆕 Resizable Bars from both **left** and **righ** ends with `barOptions.resizability` options
+- 🆕 Movable Bars (**vertial** and **horizontal** support) with `barOptions.movability` options
+- 🆕 Easy to sort bars to align them one after the another
 
 ## Requirements:
 - jQuery v1.10.2 or above:
