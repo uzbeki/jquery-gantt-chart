@@ -55,7 +55,6 @@ class Movable {
 
   handleMouseUp() {
     this.isDragging = false;
-    console.log(this.options.stepSize);
 
     const moveEvent = new CustomEvent("move", {
       detail: {

@@ -80,7 +80,6 @@ export const canChangeScale = (nextScale, minScale, maxScale, zoomIn) => {
   // return ["months", "weeks", "days"].includes(nextScale);
 };
 
-
 /**
  * Counts the number of work days between two dates.
  * Ignores Saturdays and Sundays and provided holidays.
@@ -89,7 +88,7 @@ export const canChangeScale = (nextScale, minScale, maxScale, zoomIn) => {
  * @param {Array<Date>} holidays - An array of holiday dates.
  * @returns {number} The number of work days between the two dates.
  */
-export const countWorkDays = (startDate, endDate, holidays=[]) => {
+export const countWorkDays = (startDate, endDate, holidays = []) => {
   if (startDate > endDate) throw new Error("Start date must be before end date.");
   let count = 0;
   let currentDate = new Date(startDate);
@@ -100,4 +99,23 @@ export const countWorkDays = (startDate, endDate, holidays=[]) => {
     currentDate.setDate(currentDate.getDate() + 1);
   }
   return count;
-}
+};
+
+/**
+ * Calculates the navigation values based on the target, scale, and cell size.
+ *
+ * @param {"prevWeek"|"nextWeek"|"prevDay"|"nextDay"} target - The target navigation value (prevWeek, nextWeek, prevDay, nextDay).
+ * @param {import("./initials").Scale} scale - The scale of the navigation (hours, days, weeks, months).
+ * @param {number} cellSize - The size of the cell.
+ * @returns {number} - The calculated navigation value.
+ */
+export const getNavigationValues = (target, scale, cellSize) => {
+  const navigationValues = {
+    prevWeek: { hours: 8, days: 30, weeks: 12, months: 6 },
+    nextWeek: { hours: -8, days: -30, weeks: -12, months: -6 },
+    prevDay: { hours: 4, days: 7, weeks: 4, months: 3 },
+    nextDay: { hours: -4, days: -7, weeks: -4, months: -3 },
+  };
+
+  return navigationValues[target][scale] * cellSize || 0;
+};

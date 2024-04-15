@@ -237,6 +237,7 @@
 
 /* === BOTTOM NAVIGATION === */
 
+.fn-gantt .bottom select,
 .fn-gantt .bottom button {
     cursor: pointer;
     background-color: transparent;

@@ -73,7 +73,6 @@ export const initialResizerOptions = {
 /**
  * @typedef {Object} Settings
  * @property {Source} source - Source data for the chart
- * @property {"buttons" | "scroll"} navigate - Navigation type ("buttons" or "scroll")
  * @property {Scale} scale - Scale of the chart ("years", "months", "weeks", "days", "half days", "every 8 hours", "every 6 hours", "every 3 hours", "every hour")
  * @property {Scale} maxScale - Maximum scale of the chart ("months", "weeks", "days", "half days", "every 8 hours", "every 6 hours", "every 3 hours", "every hour")
  * @property {Scale} minScale - Minimum scale of the chart ("hours", "days", "weeks", "months", "years")
@@ -90,20 +89,20 @@ export const initialResizerOptions = {
  * @property {function(data: Object): void} onItemClick - Callback function for item click event
  * @property {function(dt: Date, rowId: number): void} onAddClick - Callback function for add click event
  * @property {function(): void} onRender - Callback function for render event
- * @property {function(page: number): Promise<void>} onGetPage - Callback function for get page event
+ * @property {function(page: number, pageSize: number): Promise<Source>} onGetPage - Callback function for get page event
+ * @property {function(pageSize: number, currentPage:number): Promise<Source>} onPageSizeChange - Callback function for get page event
  * @property {function(bar: Object, data: Object): void} onBarResize - Callback function for bar resize event
  */
 
 /** @type {Settings} */
 export const initialSettings = {
   source: {},
-  navigate: "scroll",
   scale: "days",
   maxScale: "months",
   // minScale: "every hour",
   minScale: "hour",
   cellSize: DEFAULT_CELL_SIZE,
-  scrollToToday: true,
+  scrollToToday: false,
   rememberZoomLevel: true,
   zoomLevelKey: "jquery-gantt-chart-zoom-level",
   rememberHeaderOrder: true,
@@ -131,7 +130,8 @@ export const initialSettings = {
   onItemClick: data => {},
   onAddClick: (dt, rowId) => {},
   onRender: () => {},
-  onGetPage: async page => {},
+  onGetPage: async (page, pageSize) => {},
+  onPageSizeChange: async (pageSize, currentPage) => {},
   onBarResize: (bar, data) => {},
 };
 

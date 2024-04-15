@@ -99,7 +99,6 @@ Simply include the plugin and its stylesheet in your html file and call it on a 
 
 ## Customizable Options
 - `source` - json data, defaults to `{}`
-- `navigate` - navigation type (buttons, scroll), defaults to `scroll`
 - `scrollToToday` - scroll to today, defaults to `true`
 - `zoomLevelKey` - key to save zoom level, defaults to `jquery-gantt-chart-zoom-level`
 - `rememberZoomLevel` - remember current zoom level, defaults to `true`
