@@ -11,7 +11,7 @@ import Movable from "./helpers/Movable.js";
 import Resizer from "./helpers/Resizer.js";
 import DragAndSort, { getOrder } from "./helpers/index.js";
 import { initialSettings } from "./helpers/initials.js";
-import { adjustDate, daysBetween, getMonthId, monthsBetween } from "./helpers/utils.js";
+import { adjustDate, countWorkDays, daysBetween, getMonthId, monthsBetween } from "./helpers/utils.js";
 
 function main() {
   "use strict";
@@ -94,7 +94,13 @@ function main() {
     //Default settings
     var settings = initialSettings;
     // read options
+    options.holidays = (options.holidays || []).map(h => new Date(h)); // convert to Date objects
     $.extend(settings, options);
+    if (options?.cellSize) {
+      if (!options?.barOptions?.resizability?.stepSize) settings.barOptions.resizability.stepSize = options.cellSize;
+      if (!options?.barOptions?.resizability?.minWidth) settings.barOptions.resizability.minWidth = options.cellSize;
+      if (!options?.barOptions?.movability?.stepSize) settings.barOptions.movability.stepSize = options.cellSize;
+    }
 
     // Grid management
     // ===============
@@ -208,13 +214,14 @@ function main() {
         const entries = element.data.map((entry, i) => {
           const dataId = entry?.id ? `data-id="${entry.id}"` : "";
           const offset = (i % settings.itemsPerPage) * tools.getCellSize();
-          return `<li class="row fn-label row${i} ${entry.cssClass || ""}" ${dataId} 
+          return $(`<li class="row fn-label row${i} ${entry.cssClass || ""}" ${dataId} 
             id="rowheader${entry.id}" data-offset="${offset}">
             ${entry.name || ""} ${entry.desc ? "(" + entry.desc + ")" : ""}
-          </li>`;
+          </li>`).on("click", e => e.currentTarget.classList.toggle("selected"));
         });
         const rowList = $('<ul class="row-list"/>');
-        return ganttLeftPanel.append(rowList.append(entries.join("")));
+        // return ganttLeftPanel.append(rowList.append(entries.join("")));
+        return ganttLeftPanel.append(rowList.append(entries));
       },
 
       // Create and return the data panel element
@@ -650,6 +657,14 @@ function main() {
               .append(
                 $('<div class="nav-slider-left" />')
                   .append(
+                    $(`<button type="button" class="btn btn-outline-dark nav-sort-bar-order" title="Sort bar order">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list-nested" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M4.5 11.5A.5.5 0 0 1 5 11h10a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5m-2-4A.5.5 0 0 1 3 7h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m-2-4A.5.5 0 0 1 1 3h10a.5.5 0 0 1 0 1H1a.5.5 0 0 1-.5-.5"/>
+                          </svg>
+                          <!-- <span>続けて表示</span> -->
+                      </button>`).on("click", e => core.sortBars(element))
+                  )
+                  .append(
                     $(`<button type="button" class="btn btn-outline-dark nav-page-back" title="Previous page">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-dash-circle" viewBox="0 0 16 16">
                           <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
@@ -915,12 +930,8 @@ function main() {
             <div class="fn-label">${day.label}</div>
           </div>`
         ).data("dataObj", day);
-        new Resizer(bar.get(0), { stepSize: settings.cellSize, minWidth: settings.cellSize });
-        new Movable(bar.get(0), { stepSize: settings.cellSize });
-        // bar.on("resize", e => {
-        //   console.log("Resized", e.detail.width, day.label);
-        //   settings.onBarResize(day, e.detail.width);
-        // });
+        new Resizer(bar.get(0), settings.barOptions.resizability);
+        new Movable(bar.get(0), settings.barOptions.movability);
         if (day.classNames) bar.addClass(day.classNames);
         bar.on("click", e => {
           e.stopPropagation();
@@ -1057,6 +1068,45 @@ function main() {
           core.setData(element, data);
           core.init(element);
         });
+      },
+
+      // Sort bars
+      sortBars: function (element) {
+        // /** @type {typeof settings.source} */
+        const selectedIds = $(element)
+          .find(".fn-gantt ul.row-list li.selected")
+          .map((i, el) => parseInt(el.id.replace("rowheader", "")))
+          .toArray();
+        if (element.preSortData === undefined) {
+          element.preSortData = structuredClone(element.data);
+          let selectedData = element.data.filter(d => selectedIds.includes(d.id));
+          selectedData = selectedData.length ? selectedData : element.data;
+          let last_date = selectedData[0].values[0].to;
+          for (let i = 0; i < selectedData.length; i++) {
+            const entry = selectedData[i];
+            for (let j = 0; j < entry.values.length; j++) {
+              const val = entry.values[j];
+              if (i === 0 && j === 0) continue;
+              const diff = val.to - val.from;
+              val.from = last_date;
+              val.to = new Date(last_date.getTime() + diff);
+              last_date = new Date(val.to.getTime() + 24 * 60 * 60 * 1000);
+            }
+          }
+          const startDate = selectedData[0].values[0].from;
+          const endDate =
+            selectedData[selectedData.length - 1].values[selectedData[selectedData.length - 1].values.length - 1].to;
+          console.log(`work days: ${countWorkDays(startDate, endDate, settings.holidays)}`);
+          core.init(element);
+          // $(element).find(".fn-gantt .nav-sort-bar-order span").text("キャンセル");
+          // readd selected class to the rows
+          selectedIds.forEach(id => $(element).find(`#rowheader${id}`).addClass("selected"));
+        } else {
+          element.data = structuredClone(element.preSortData);
+          element.preSortData = undefined;
+          core.init(element);
+          // $(element).find(".fn-gantt .nav-sort-bar-order span").text("続けて表示");
+        }
       },
 
       // Change zoom level

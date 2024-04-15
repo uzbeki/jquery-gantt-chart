@@ -79,3 +79,25 @@ export const canChangeScale = (nextScale, minScale, maxScale, zoomIn) => {
   return SCALES.indexOf(nextScale) <= SCALES.indexOf(maxScale);
   // return ["months", "weeks", "days"].includes(nextScale);
 };
+
+
+/**
+ * Counts the number of work days between two dates.
+ * Ignores Saturdays and Sundays and provided holidays.
+ * @param {Date} startDate - The start date.
+ * @param {Date} endDate - The end date.
+ * @param {Array<Date>} holidays - An array of holiday dates.
+ * @returns {number} The number of work days between the two dates.
+ */
+export const countWorkDays = (startDate, endDate, holidays=[]) => {
+  if (startDate > endDate) throw new Error("Start date must be before end date.");
+  let count = 0;
+  let currentDate = new Date(startDate);
+  while (currentDate <= endDate) {
+    if (currentDate.getDay() !== 0 && currentDate.getDay() !== 6 && !holidays.includes(currentDate)) {
+      count++;
+    }
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+  return count;
+}

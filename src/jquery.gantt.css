@@ -77,6 +77,10 @@
     background-color: hsl(0, 0%, 80%);
 }
 
+.fn-gantt .leftPanel .row-list li.selected {
+    background-color: hsl(0, 0%, 80%);
+}
+
 /* === RIGHT PANEL === */
 .fn-gantt .rightPanel {
     overflow: hidden;
@@ -242,6 +246,8 @@
     color: #333;
     transition: all 0.3s;
     display: flex;
+    align-items: center;
+    gap: 0.25rem;
 }
 
 .fn-gantt .bottom button:hover {
@@ -261,6 +267,10 @@
     align-items: center;
     justify-content: center;
     padding-block: 1rem;
+}
+
+.fn-gantt .navigate .nav-sort-bar-order {
+    margin-inline: 0.5rem;
 }
 
 .fn-gantt .navigate .nav-slider {

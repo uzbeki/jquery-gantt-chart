@@ -1,3 +1,48 @@
+const DEFAULT_CELL_SIZE = 24;
+/**
+ * @typedef {Object} MovableOptions
+ * @property {number} [stepSize=1] - The step size for resizing the element.
+ * @property {boolean} [horizontal=true] - Whether the element can be moved horizontally (left and right).
+ * @property {boolean} [vertical=true] - Whether the element can be moved vertically (up and down).
+ * @property {number} [minX=0] - The minimum value for the left position.
+ * @property {number} [minY=0] - The minimum value for the top position.
+ * @property {number} [maxX=Number.POSITIVE_INFINITY] - The maximum value for the left position.
+ * @property {number} [maxY=Number.POSITIVE_INFINITY] - The maximum value for the top position.
+ */
+
+/** @type {MovableOptions} */
+export const initialMovableOptions = {
+  stepSize: DEFAULT_CELL_SIZE,
+  horizontal: true,
+  vertical: false,
+  minX: 0,
+  minY: 0,
+  maxX: Number.POSITIVE_INFINITY,
+  maxY: Number.POSITIVE_INFINITY,
+};
+
+/**
+ * @typedef {Object} ResizerOptions
+ * @property {number} [minWidth=10] - The minimum width of the element in pixels.
+ * @property {number} [maxWidth=Infinity] - The maximum width of the element in pixels.
+ * @property {Function} [onResize=(newWidth) => {}] - The callback function to be called when the element is resized.
+ * @property {number} [stepSize=1] - The step size for resizing the element.
+ * @property {string} [handleVisibility="hover"] - The visibility of the resize handles. Possible values: "hover" | "click" | "always".
+ * @property {boolean} [leftHandle=false] - Whether to show the left handle.
+ * @property {boolean} [rightHandle=true] - Whether to show the right handle.
+ */
+
+/** @type {ResizerOptions} */
+export const initialResizerOptions = {
+  minWidth: DEFAULT_CELL_SIZE,
+  maxWidth: Infinity,
+  onResize: newWidth => {},
+  stepSize: DEFAULT_CELL_SIZE,
+  handleVisibility: "hover", // "hover" | "click" | "always"
+  leftHandle: false,
+  rightHandle: true,
+};
+
 /**
  * @typedef {Object} Source
  * @property {SourceData[]} data - Array of data objects
@@ -41,6 +86,7 @@
  * @property {Array<string>} dow - Array of day of week labels
  * @property {Array<string>} months - Array of month labels
  * @property {Array<string>} holidays - Array of holiday dates
+ * @property {{resizability: ResizerOptions, movability: MovableOptions}} barOptions - Options for bar resizing and moving
  * @property {function(data: Object): void} onItemClick - Callback function for item click event
  * @property {function(dt: Date, rowId: number): void} onAddClick - Callback function for add click event
  * @property {function(): void} onRender - Callback function for render event
@@ -56,7 +102,7 @@ export const initialSettings = {
   maxScale: "months",
   // minScale: "every hour",
   minScale: "hour",
-  cellSize: 24,
+  cellSize: DEFAULT_CELL_SIZE,
   scrollToToday: true,
   rememberZoomLevel: true,
   zoomLevelKey: "jquery-gantt-chart-zoom-level",
@@ -78,6 +124,10 @@ export const initialSettings = {
     "December",
   ],
   holidays: [],
+  barOptions: {
+    resizability: initialResizerOptions,
+    movability: initialMovableOptions,
+  },
   onItemClick: data => {},
   onAddClick: (dt, rowId) => {},
   onRender: () => {},

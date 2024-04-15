@@ -1,37 +1,18 @@
-/**
- * @typedef {Object} ResizerOptions
- * @property {number} [minWidth=10] - The minimum width of the element in pixels.
- * @property {number} [maxWidth=Infinity] - The maximum width of the element in pixels.
- * @property {Function} [onResize=(newWidth) => {}] - The callback function to be called when the element is resized.
- * @property {number} [stepSize=1] - The step size for resizing the element.
- * @property {string} [handleVisibility="hover"] - The visibility of the resize handles. Possible values: "hover" | "click" | "always".
- * @property {boolean} [leftHandle=false] - Whether to show the left handle.
- * @property {boolean} [rightHandle=true] - Whether to show the right handle.
- */
-const initialOptions = {
-  minWidth: 10,
-  maxWidth: Infinity,
-  onResize: newWidth => {},
-  stepSize: 1,
-  handleVisibility: "hover", // "hover" | "click" | "always"
-  leftHandle: false,
-  rightHandle: true
-};
-
+import { initialResizerOptions } from "./initials.js";
 class Resizer {
   /**
    * Creates a new instance of the Resizer class.
    * @param {HTMLElement} element - The element to be resized.
-   * @param {ResizerOptions} [options=initialOptions] - The options for the Resizer.
+   * @param {typeof initialResizerOptions} [options=initialResizerOptions] - The options for the Resizer.
    */
-  constructor(element, options = initialOptions) {
+  constructor(element, options = initialResizerOptions) {
     this.element = element;
     this.leftHandle = null;
     this.rightHandle = null;
     this.startX = 0;
     this.startWidth = 0;
 
-    this.options = { ...initialOptions, ...options }; // TODO: validate options, ex: minWidth < maxWidth, types
+    this.options = { ...initialResizerOptions, ...options }; // TODO: validate options, ex: minWidth < maxWidth, types
     // Bind the methods in the constructor
     this.startResize = this.startResize.bind(this);
     this.resize = this.resize.bind(this);

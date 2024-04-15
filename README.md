@@ -32,8 +32,8 @@ This is a fork of the original [jquery-gantt](https://github.com/taitems/jQuery.
 
 ## About
 
-jQuery Gantt Chart is a simple and fast plugin that implements gantt functionality as 
-a jQuery component.
+jQuery Gantt Chart is a modern and fast plugin that implements gantt functionality as 
+a jQuery component with JS Module support.
 
 Plugin was tested and should work on:
 All major browsers that support ES6 or above.
@@ -60,7 +60,14 @@ All major browsers that support ES6 or above.
 ```
 
 ## Usage
-Simply include the plugin in your html file and call it on a div element. 
+Simply include the plugin and its stylesheet in your html file and call it on a div element. 
+
+```html
+<link rel="stylesheet" href="./src/jquery.gantt.css">
+<script type="module" src="./src/index.js"></script>
+```
+
+<!-- Simply include the plugin in your html file and call it on a div element. 
 
 ### Download the plugin and include it in your html file
 
@@ -73,18 +80,20 @@ Simply include the plugin in your html file and call it on a div element.
 ```html
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@uzbeki/jquery-gantt-chart/dist/jquery.gantt.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/@uzbeki/jquery-gantt-chart/dist/jquery.gantt.min.js"></script>
-```
+``` -->
 
 ### Create a div element and call the plugin on it
 ```js
-$("#gantt").gantt({
-    source: data, // json data
-    scale: "days",
-    onItemClick: console.log,
-    onAddClick: console.log,
-    onRender: () => console.log("chart rendered"),
-    onGetPage: (page) => yourPageHandler(page),
-  });
+<script type="module">
+  $("#gantt").gantt({
+      source: data, // json data
+      scale: "days",
+      onItemClick: console.log,
+      onAddClick: console.log,
+      onRender: () => console.log("chart rendered"),
+      onGetPage: (page) => yourPageHandler(page),
+    });
+</script>
 ```
 
 ## Customizable Options
@@ -102,6 +111,9 @@ $("#gantt").gantt({
 - `itemsPerPage` - items per page, defaults to `10`
 - `dow` - days of week, defaults to `["S", "M", "T", "W", "T", "F", "S"]`
 - `months` - months, defaults to `["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]`
+- `barOptions` - bar options, defaults to [DefaultBarOptions](#defaultbaroptions)
+  - `resizability` - bar resizability, defaults to [DefaultBarOptions.resizability](#defaultbaroptions)
+  - `movability` - bar movability, defaults to [DefaultBarOptions.movability](#defaultbaroptions)
 - `onItemClick` - callback on item click, called with item object
 - `onAddClick` - callback on add button click, called with date and row data
 - `onRender` - callback on chart render
@@ -126,6 +138,30 @@ type SourceData = {
   currentPage: number;
   pageCount: number;
   itemsPerPage: number;
+};
+```
+
+### DefaultBarOptions
+```ts
+const DefaultBarOptions = {
+  resizability: {
+    minWidth: DEFAULT_CELL_SIZE, // 24
+    maxWidth: Infinity, // maximum width
+    onResize: newWidth => {}, // callback on resize
+    stepSize: DEFAULT_CELL_SIZE, // 24
+    handleVisibility: "hover", // "hover" | "click" | "always"
+    leftHandle: false, // show left handle to resize
+    rightHandle: true, // show right handle to resize
+  },
+  movability: {
+    stepSize: DEFAULT_CELL_SIZE, // 24
+    horizontal: true, // allow horizontal movement
+    vertical: false, // allow vertical movement
+    minX: 0, // minimum x position
+    minY: 0, // minimum y position
+    maxX: Number.POSITIVE_INFINITY, // maximum x position
+    maxY: Number.POSITIVE_INFINITY, // maximum y position
+  };
 };
 ```
 

@@ -15,7 +15,7 @@
         <!-- <link rel="stylesheet" href="./dist/jquery.gantt.min.css"> -->
         <!-- <script src="./dist/jquery.gantt.min.js"></script> -->
         <link rel="stylesheet" href="./src/jquery.gantt.css">
-        <script type="module" src="./src//index.js"></script>
+        <script type="module" src="./src/index.js"></script>
         <title>jQuery Gantt Chart Demo</title>
         <style>
             #gantt {
@@ -55,11 +55,12 @@
                 </li>
                 <li>📅 Mark holidays or today</li>
                 <li>🔍 Zoom in/out</li>
-                <li>🆕 Drag Sortable Header Support (from <code>v0.3.0</code>)</li>
-                <li>🆕 ES Module support (from <code>v0.3.0</code>)</li>
-                <li>🆕 Remember Zoom Level and Header Order (from <code>v0.3.5</code>)</li>
-                <li>🔜 Resizable Bars (coming soon from <code>v0.4.0</code>)</li>
-                <li>🔜 Movable Bars (coming soon from <code>v0.5.0</code>)</li>
+                <li>🆕 Drag Sortable Header Support</li>
+                <li>🆕 ES Module support</li>
+                <li>🆕 Remember Zoom Level and Header Order</li>
+                <li>🆕 Resizable Bars from both left and righ ends with <code>barOptions.resizability</code> options</li>
+                <li>🆕 Movable Bars (vertial and horizontal support) with <code>barOptions.movability</code> options</li>
+                <li>Easy to sort bars to align them one after the another</li>
             </ul>
             <p>For more, please refer to <a href="https://github.com/uzbeki/jquery-gantt-chart#readme">README file</a>.
             </p>
@@ -416,6 +417,16 @@
                     navigate: "scroll", // buttons, scroll
                     scale: "days",
                     cellSize: 26,
+                    barOptions: {
+                        resizability: {
+                            leftHandle: false,
+                            rightHandle: true,
+                        },
+                        movability: {
+                            horizontal: true,
+                            vertical: false,
+                        },
+                    },
                     onItemClick: console.log,
                     onAddClick: console.log,
                     onRender: () => console.log("chart rendered"),

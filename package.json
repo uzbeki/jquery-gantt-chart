@@ -2,10 +2,10 @@
   "name": "@uzbeki/jquery-gantt-chart",
   "description": "Simple Gantt Chart implemented with modernJS and jQuery. Previously known as jQuery.Gantt.",
   "homepage": "https://github.com/uzbeki/jquery-gantt-chart#readme",
-  "version": "0.3.0",
+  "version": "1.0.0",
   "type": "module",
-  "main": "./dist/jquery.gantt.js",
-  "module": "./dist/jquery.gantt.js",
+  "main": "./src/index.js",
+  "module": "./src/index.js",
   "engines": {
     "node": ">= 10.0.0"
   },

@@ -1,28 +1,15 @@
-/**
- * @typedef {Object} MovableOptions
- * @property {number} [stepSize=1] - The step size for resizing the element.
- * @property {boolean} [horizontal=true] - Whether the element can be moved horizontally (left and right).
- * @property {boolean} [vertical=true] - Whether the element can be moved vertically (up and down).
- * @property {number} [minX=0] - The minimum value for the left position.
- * @property {number} [minY=0] - The minimum value for the top position.
- * @property {number} [maxX=Number.POSITIVE_INFINITY] - The maximum value for the left position.
- * @property {number} [maxY=Number.POSITIVE_INFINITY] - The maximum value for the top position.
- */
-const initialOptions = {
-  stepSize: 1,
-  horizontal: true,
-  vertical: false,
-  minX: 0,
-  minY: 0,
-  maxX: Number.POSITIVE_INFINITY,
-  maxY: Number.POSITIVE_INFINITY,
-};
+import { initialMovableOptions } from "./initials.js";
 
 class Movable {
-  constructor(element, options = initialOptions) {
+  /**
+   * Creates an instance of Movable.
+   * @constructor
+   * @param {HTMLElement} element - The element to make movable.
+   * @param {typeof initialMovableOptions} [options=initialMovableOptions] - The options for the movable object.
+   */
+  constructor(element, options = initialMovableOptions) {
     this.element = element;
-    this.options = { ...initialOptions, ...options };
-
+    this.options = { ...initialMovableOptions, ...options };
     // move with mouse
     this.element.addEventListener("mousedown", this.handleMouseDown.bind(this));
     document.addEventListener("mousemove", this.handleMouseMove.bind(this));
@@ -68,6 +55,7 @@ class Movable {
 
   handleMouseUp() {
     this.isDragging = false;
+    console.log(this.options.stepSize);
 
     const moveEvent = new CustomEvent("move", {
       detail: {
