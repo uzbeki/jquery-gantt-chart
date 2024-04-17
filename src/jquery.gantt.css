@@ -485,3 +485,75 @@
 .fn-gantt .bar:not(.resizing) .resizer-handle.hidden {
     width: 0;
 }
+
+.gantt-tooltip {
+    --arrow-width: 10px;
+    position: absolute;
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding-block: 0.5rem;
+    z-index: 10;
+    font-size: 0.75rem;
+    width: fit-content;
+    max-width: 300px;
+}
+
+.gantt-tooltip h3,
+.gantt-tooltip p {
+    margin: 0;
+    padding: 0;
+    padding-inline: 0.5rem;
+}
+
+.gantt-tooltip h3 {
+    font-size: 1rem;
+    border-bottom: 1px solid #ccc;
+    padding-block: 0.25rem;
+    margin-bottom: 0.25rem;
+}
+
+.gantt-tooltip p:empty,
+.gantt-tooltip h3:empty {
+    display: none;
+}
+
+
+.gantt-tooltip::before {
+    width: 0;
+    height: 0;
+    content: "";
+    position: absolute;
+    border-width: var(--arrow-width);
+    border-style: solid;
+    border-color: transparent;
+}
+
+.gantt-tooltip[data-position='top']::before {
+    top: 100%;
+    left: 50%;
+    margin-left: calc(-1 * var(--arrow-width));
+    border-top-color: #ccc;
+}
+
+
+.gantt-tooltip[data-position='bottom']::before {
+    bottom: 100%;
+    left: 50%;
+    margin-left: calc(-1 * var(--arrow-width));
+    border-bottom-color: #ccc;
+}
+
+.gantt-tooltip[data-position='right']::before {
+    top: 50%;
+    right: 100%;
+    margin-top: calc(-1 * var(--arrow-width));
+    border-right-color: #ccc;
+}
+
+.gantt-tooltip[data-position='left']::before {
+    top: 50%;
+    left: 100%;
+    margin-top: calc(-1 * var(--arrow-width));
+    border-left-color: #ccc;
+}

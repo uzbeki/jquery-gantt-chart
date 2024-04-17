@@ -9,6 +9,7 @@
 
 import Movable from "./helpers/Movable.js";
 import Resizer from "./helpers/Resizer.js";
+import Tooltip from "./helpers/Tooltip.js";
 import DragAndSort, { getOrder } from "./helpers/index.js";
 import { initialSettings } from "./helpers/initials.js";
 import { NAVIGATION_TEMPLATE } from "./helpers/templates.js";
@@ -793,6 +794,7 @@ function main() {
         ).data("dataObj", day);
         new Resizer(bar.get(0), settings.barOptions.resizability);
         new Movable(bar.get(0), settings.barOptions.movability);
+        new Tooltip(bar.get(0), { content: day.label, position: "top", title: day.label });
         if (day.classNames) bar.addClass(day.classNames);
         bar.on("click", e => {
           e.stopPropagation();
@@ -1266,14 +1268,19 @@ function main() {
       // Returns true when the given date appears in the array of holidays, if provided
       isHoliday: function (date) {
         if (!settings.holidays || !settings.holidays.length) return false;
-        const areDatesEqual = (date1, date2) => {
-          return (
-            date1.getDate() === date2.getDate() &&
-            date1.getMonth() === date2.getMonth() &&
-            date1.getFullYear() === date2.getFullYear()
-          );
-        };
-        return settings.holidays.some(holiday => areDatesEqual(date, holiday));
+        try {
+          const areDatesEqual = (date1, date2) => {
+            return (
+              date1.getDate() === date2.getDate() &&
+              date1.getMonth() === date2.getMonth() &&
+              date1.getFullYear() === date2.getFullYear()
+            );
+          };
+          return settings.holidays.some(holiday => areDatesEqual(date, holiday));
+        } catch (error) {
+          console.error("Error checking if date is a holiday", error, date);
+          return false;
+        }
       },
 
       getCellSize: () => settings.cellSize,
