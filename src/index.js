@@ -15,6 +15,7 @@ import { initialSettings } from "./helpers/initials.js";
 import { NAVIGATION_TEMPLATE } from "./helpers/templates.js";
 import {
   adjustDate,
+  areDatesEqual,
   countWorkDays,
   daysBetween,
   getMonthId,
@@ -838,8 +839,8 @@ function main() {
 
               // **Weekly data**
               case "weeks":
-                startOffset = $(element).find(`#${day.from.getWeekId()}`).data("offset");
-                endOffset = $(element).find(`#${day.to.getWeekId()}`).data("offset");
+                startOffset = $(element).find(`#${new Date(day.from).getWeekId()}`).data("offset");
+                endOffset = $(element).find(`#${new Date(day.to).getWeekId()}`).data("offset");
 
                 cellCount = Math.round((endOffset - startOffset) / cellWidth) + 1;
                 barWidth = cellWidth * cellCount;
@@ -850,7 +851,7 @@ function main() {
               // **Monthly data**
               case "months":
                 startOffset = $(element)
-                  .find(`#dh-${getMonthId(day.from)}`)
+                  .find(`#dh-${getMonthId(new Date(day.from))}`)
                   .data("offset");
                 cellCount = monthsBetween(day.from, day.to);
                 barWidth = cellWidth * cellCount;
@@ -1265,22 +1266,13 @@ function main() {
         }
         return dayMap;
       },
-      // Returns true when the given date appears in the array of holidays, if provided
+
+      /**
+       * Returns true when the given date appears in the array of holidays, if provided
+       * @param {number} date - date in milliseconds */
       isHoliday: function (date) {
         if (!settings.holidays || !settings.holidays.length) return false;
-        try {
-          const areDatesEqual = (date1, date2) => {
-            return (
-              date1.getDate() === date2.getDate() &&
-              date1.getMonth() === date2.getMonth() &&
-              date1.getFullYear() === date2.getFullYear()
-            );
-          };
-          return settings.holidays.some(holiday => areDatesEqual(date, holiday));
-        } catch (error) {
-          console.error("Error checking if date is a holiday", error, date);
-          return false;
-        }
+        return settings.holidays.some(holiday => areDatesEqual(date, holiday));
       },
 
       getCellSize: () => settings.cellSize,

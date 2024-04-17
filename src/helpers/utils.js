@@ -13,7 +13,8 @@ export const daysBetween = (date1, date2) => {
   return days + 1;
 };
 
-export const monthsBetween = (date1, date2) => {
+export const monthsBetween = (_date1, _date2) => {
+  const [date1, date2] = [new Date(_date1), new Date(_date2)];
   const months = (date2.getFullYear() - date1.getFullYear()) * 12 + (date2.getMonth() - date1.getMonth());
   return months + 1;
 };
@@ -24,9 +25,8 @@ export const weeksBetween = (date1, date2) => {
   return weeks + 1;
 };
 
-export const getMonthId = date => {
-  return `${date.getFullYear()}-${date.getMonth()}`;
-};
+/** @param {Date} date */
+export const getMonthId = date => `${date.getFullYear()}-${date.getMonth()}`;
 
 /**
  * Adjusts the given date by the specified amount and scale.
@@ -167,8 +167,8 @@ export const sanitizeSource = source => {
         if (value.to && isNaN(new Date(value.to).getTime())) {
           throw new Error(`Value.to must be a valid date. ${value.to}`);
         }
-        value.from = value.from ? new Date(value.from) : null;
-        value.to = value.to ? new Date(value.to) : null;
+        value.from = value.from ? new Date(value.from).getTime() : null;
+        value.to = value.to ? new Date(value.to).getTime() : null;
       });
     });
     isValid = true;
@@ -178,6 +178,7 @@ export const sanitizeSource = source => {
   return { isValid, source };
 };
 
-const areDatesEqual = (date1, date2) => {
+export const areDatesEqual = (_date1, _date2) => {
+  const [date1, date2] = [new Date(_date1), new Date(_date2)];
   return date1.getDate() === date2.getDate() && date1.getMonth() === date2.getMonth() && date1.getFullYear() === date2.getFullYear();
 }
