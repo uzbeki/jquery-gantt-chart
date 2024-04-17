@@ -785,13 +785,17 @@ function main() {
         return progressContainer;
       },
 
-      // **Bar**
-      // Return an element representing a progress of position within the entire chart
+      /**
+       * Return an element representing a progress of position within the entire chart
+       * @param {import("./helpers/initials.js").Value} day */
       createBar: function (day) {
-        const l = d => dateToScale(d, settings.scale);
         const bar = $(`<div class="bar"><div class="fn-label">${day.label}</div></div>`).data("dataObj", day);
-        bar.resize = new Resizer(bar.get(0), settings.barOptions.resizability);
+
+        if (!day.from) bar.addClass("noStart");
+        if (!day.to) bar.addClass("noEnd");
+        if (day.from && day.to) bar.resize = new Resizer(bar.get(0), settings.barOptions.resizability);
         bar.movable = new Movable(bar.get(0), settings.barOptions.movability);
+        const l = d => dateToScale(d, settings.scale);
         const content = `${day.label} (${l(day.from)} - ${l(day.to)})`;
         bar.tooltip = new Tooltip(bar.get(0), { content, position: "top", title: day.label });
 
@@ -814,7 +818,8 @@ function main() {
             .find("#rowheader" + entry.id)
             .data("offset");
           $.each(entry.values, function (j, day) {
-            if (!day.from || !day.to) return console.error("Invalid date range", day);
+            if (!day.from && !day.to) return;
+
             const bar = core.createBar(day);
             let endOffset = 0,
               cellCount = 1;
@@ -822,12 +827,21 @@ function main() {
               startOffset = 0,
               barWidth = 0;
 
+            let dummyDate = null; // used for calculating the bar width when one of the dates is missing
+            if (!day.from) {
+              dummyDate = adjustDate(day.to, -5, settings.scale);
+            }
+
+            if (!day.to) {
+              dummyDate = adjustDate(day.from, 5, settings.scale);
+            }
+
             switch (settings.scale) {
               // **Hourly data**
               case "hours":
-                const dFrom = tools.genId(tools.dateDeserialize(day.from), element.scaleStep);
+                const dFrom = tools.genId(tools.dateDeserialize(day.from || dummyDate), element.scaleStep);
                 const from = $(element).find("#dh-" + dFrom);
-                const dTo = tools.genId(tools.dateDeserialize(day.to), element.scaleStep);
+                const dTo = tools.genId(tools.dateDeserialize(day.to || dummyDate), element.scaleStep);
                 const to = $(element).find("#dh-" + dTo);
                 startOffset = from.data("offset");
                 endOffset = to.data("offset");
@@ -839,10 +853,10 @@ function main() {
               // **Weekly data**
               case "weeks":
                 startOffset = $(element)
-                  .find(`#${new Date(day.from).getWeekId()}`)
+                  .find(`#${new Date(day.from || dummyDate).getWeekId()}`)
                   .data("offset");
                 endOffset = $(element)
-                  .find(`#${new Date(day.to).getWeekId()}`)
+                  .find(`#${new Date(day.to || dummyDate).getWeekId()}`)
                   .data("offset");
 
                 cellCount = Math.round((endOffset - startOffset) / cellWidth) + 1;
@@ -854,9 +868,9 @@ function main() {
               // **Monthly data**
               case "months":
                 startOffset = $(element)
-                  .find(`#dh-${getMonthId(new Date(day.from))}`)
+                  .find(`#dh-${getMonthId(new Date(day.from || dummyDate))}`)
                   .data("offset");
-                cellCount = monthsBetween(day.from, day.to);
+                cellCount = monthsBetween(day.from || dummyDate, day.to || dummyDate);
                 barWidth = cellWidth * cellCount;
                 headerCount = 2;
                 break;
@@ -865,10 +879,10 @@ function main() {
               case "days":
               /* falls through */
               default:
-                cellCount = daysBetween(day.from, day.to);
+                cellCount = daysBetween(day.from || dummyDate, day.to || dummyDate);
                 barWidth = cellWidth * cellCount;
                 startOffset = $(element)
-                  .find("#dh-" + tools.genId(day.from))
+                  .find("#dh-" + tools.genId(day.from || dummyDate))
                   .data("offset");
                 headerCount = 4;
             }
@@ -885,15 +899,15 @@ function main() {
               settings.onBarResize(dataObj, e.detail.width);
               const cellsChanged = e.detail.delta / cellWidth;
               if (cellsChanged === 0) return;
-              bar.attr('data-resized', true)
+              bar.attr("data-resized", true);
               const resizedDay = { ...dataObj, to: adjustDate(dataObj.to, cellsChanged, settings.scale) };
               bar.data("dataObj", resizedDay);
               element.data[i].values[j] = resizedDay;
 
               const l = d => dateToScale(d, settings.scale);
-              const content = `${resizedDay.label} (${l(resizedDay.from)} - ${l(resizedDay.to)})\n${e.detail.delta > 0 ? "+" : "-"} ${Math.abs(cellsChanged)} ${settings.scale} ${
-                cellsChanged > 0 ? "forward" : "back"
-              }`;
+              const content = `${resizedDay.label} (${l(resizedDay.from)} - ${l(resizedDay.to)})\n${
+                e.detail.delta > 0 ? "+" : "-"
+              } ${Math.abs(cellsChanged)} ${settings.scale} ${cellsChanged > 0 ? "forward" : "back"}`;
               bar.tooltip.refresh({ content });
             });
           });
@@ -957,21 +971,24 @@ function main() {
           element.preSortData = structuredClone(element.data);
           let selectedData = element.data.filter(d => selectedIds.includes(d.id));
           selectedData = selectedData.length ? selectedData : element.data;
-          let last_date = new Date(selectedData[0].values[0].to.getTime() + 24 * 60 * 60 * 1000);
+          selectedData = selectedData.filter(d => d.values.some(v => v.from && v.to)); // remove bars with no start or end date
+          let last_date = new Date(selectedData[0].values[0].to + 24 * 60 * 60 * 1000);
           for (let i = 0; i < selectedData.length; i++) {
             const entry = selectedData[i];
             for (let j = 0; j < entry.values.length; j++) {
               const val = entry.values[j];
               if (i === 0 && j === 0) continue;
+              // if (!val.from || !val.to) continue; // skip bars with no start or end date
               const diff = val.to - val.from;
               val.from = last_date;
               val.to = new Date(last_date.getTime() + diff);
               last_date = new Date(val.to.getTime() + 24 * 60 * 60 * 1000);
             }
           }
-          const startDate = selectedData[0].values[0].from;
-          const endDate =
-            selectedData[selectedData.length - 1].values[selectedData[selectedData.length - 1].values.length - 1].to;
+          const startDate = new Date(selectedData[0].values[0].from);
+          const endDate = new Date(
+            selectedData[selectedData.length - 1].values[selectedData[selectedData.length - 1].values.length - 1].to
+          );
           console.log(`work days: ${countWorkDays(startDate, endDate, settings.holidays)}`);
           core.init(element);
           // $(element).find(".fn-gantt .nav-sort-bar-order span").text("キャンセル");

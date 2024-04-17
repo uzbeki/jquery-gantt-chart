@@ -206,6 +206,16 @@
     border: 1px dashed var(--resizer-color);
 }
 
+.fn-gantt .bar.noStart {
+    background: linear-gradient(to right, hsl(213, 92%, 100%) 20%, hsl(213, 92%, 90%) 100%);
+    box-shadow: none;
+}
+
+.fn-gantt .bar.noEnd {
+    background: linear-gradient(to left, hsl(213, 92%, 100%) 20%, hsl(213, 92%, 90%) 100%);
+    box-shadow: none;
+}
+
 .fn-gantt .bar .fn-label {
     line-height: var(--bar-height);
     font-weight: bold;

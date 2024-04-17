@@ -150,11 +150,13 @@ class DragAndSortManager {
     // check if the number of draggable elements is the same as the saved order
     if (draggables.length !== this.draggables.length) {
       console.warn("Mismatch in number of draggable elements and saved order.");
+      localStorage.removeItem(this.LOCAL_STORAGE_KEY);
       return;
     }
     // check if all draggable elements are present in the saved order
     if (!order.every((id) => draggableIds.some(d => d === id))) {
       console.warn("Mismatch in draggable elements and saved order.");
+      localStorage.removeItem(this.LOCAL_STORAGE_KEY);
       return;
     }
     // check if the order is already the same

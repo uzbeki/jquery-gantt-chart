@@ -89,7 +89,7 @@ export const canChangeScale = (nextScale, minScale, maxScale, zoomIn) => {
  * @returns {number} The number of work days between the two dates.
  */
 export const countWorkDays = (startDate, endDate, holidays = []) => {
-  if (startDate > endDate) throw new Error("Start date must be before end date.");
+  if (startDate > endDate) throw new Error(`Start date cannot be greater than end date. ${startDate} > ${endDate}`);
   let days = 0;
   let currentDate = new Date(startDate);
   while (currentDate <= endDate) {
@@ -194,6 +194,7 @@ export const areDatesEqual = (_date1, _date2) => {
  * @returns {string} - The converted date in the specified scale.
  */
 export const dateToScale = (_date, scale) => {
+  if (!_date) return "";
   const date = new Date(_date);
   switch (scale) {
     case "hours":
