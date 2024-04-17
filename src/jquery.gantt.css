@@ -199,8 +199,11 @@
 
 .fn-gantt .bar.resizing {
     z-index: 100;
-    border: 1px solid var(--resizer-color);
-    border-style: dashed;
+    border: 1px dashed var(--resizer-color);
+}
+
+.fn-gantt .bar[data-resized] {
+    border: 1px dashed var(--resizer-color);
 }
 
 .fn-gantt .bar .fn-label {
@@ -457,7 +460,7 @@
     border: 1px solid #ccc;
     border-radius: 5px;
     padding-block: 0.5rem;
-    z-index: 10;
+    z-index: 100;
     font-size: 0.75rem;
     width: fit-content;
     max-width: 300px;
@@ -482,6 +485,9 @@
     display: none;
 }
 
+.gantt-tooltip p {
+    white-space: pre-wrap;
+}
 
 .gantt-tooltip::before {
     width: 0;

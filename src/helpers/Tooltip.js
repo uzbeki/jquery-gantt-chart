@@ -7,7 +7,7 @@
  */
 
 /** @type {TooltipOptions} */
-const initialTooltipOptions = { title: "", content: "", position: "top", space: 15, delay: 0};
+const initialTooltipOptions = { title: "", content: "", position: "top", space: 15, delay: 0 };
 
 /**
  * Represents a Tooltip.
@@ -15,7 +15,7 @@ const initialTooltipOptions = { title: "", content: "", position: "top", space: 
  * ```js
  * const element = document.getElementById("element");
  * const tooltip = new Tooltip(element, {
- *   title: "Tooltip Title", 
+ *   title: "Tooltip Title",
  *   content: "Tooltip Content",
  *   position: "top",
  *   space: 15
@@ -41,12 +41,17 @@ export default class Tooltip {
         `;
     this.tooltipElement.dataset.position = this.options.position;
 
-    this.element.addEventListener("mouseenter", this.showTooltip.bind(this));
-    this.element.addEventListener("mouseleave", this.hideTooltip.bind(this));
+    this.showTooltip = this.showTooltip.bind(this);
+    this.hideTooltip = this.hideTooltip.bind(this);
+
+    this.element.addEventListener("mouseenter", this.showTooltip);
+    this.element.addEventListener("mouseleave", this.hideTooltip);
   }
 
-  /** Shows the tooltip. */
-  showTooltip() {
+  /** Shows the tooltip.
+   * @param {MouseEvent} event - The mouse event that triggered the tooltip. */
+  showTooltip(event) {
+    if (!this.isElementInViewport()) return;
     document.body.appendChild(this.tooltipElement);
 
     const elementRect = this.element.getBoundingClientRect();
@@ -80,6 +85,31 @@ export default class Tooltip {
 
   /** Hides the tooltip. */
   hideTooltip() {
-    document.body.removeChild(this.tooltipElement);
+    if (document.body.contains(this.tooltipElement)) document.body.removeChild(this.tooltipElement);
+  }
+
+  isElementInViewport() {
+    const rect = this.element.getBoundingClientRect();
+    return rect.top >= 0 && rect.left >= 0 && rect.bottom <= window.innerHeight && rect.right <= window.innerWidth;
+  }
+
+  /** Unmounts (removes) the tooltip. */
+  unmount() {
+    this.element.removeEventListener("mouseenter", this.showTooltip);
+    this.element.removeEventListener("mouseleave", this.hideTooltip);
+    this.tooltipElement.remove();
+  }
+
+  /**
+   * Refreshes the tooltip with new options.
+   * @param {TooltipOptions} options - The options for the tooltip. */
+  refresh(options) {
+    console.log("refresh", options);
+    this.options = { ...this.options, ...options };
+    this.tooltipElement.innerHTML = `
+            <h3 class="tooltip-title">${this.options.title}</h3>
+            <p class="tooltip-content">${this.options.content}</p>
+        `;
+    this.tooltipElement.dataset.position = this.options.position;
   }
 }

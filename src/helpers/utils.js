@@ -180,5 +180,31 @@ export const sanitizeSource = source => {
 
 export const areDatesEqual = (_date1, _date2) => {
   const [date1, date2] = [new Date(_date1), new Date(_date2)];
-  return date1.getDate() === date2.getDate() && date1.getMonth() === date2.getMonth() && date1.getFullYear() === date2.getFullYear();
-}
+  return (
+    date1.getDate() === date2.getDate() &&
+    date1.getMonth() === date2.getMonth() &&
+    date1.getFullYear() === date2.getFullYear()
+  );
+};
+
+/**
+ * Converts a date to a scale.
+ * @param {number} date - The date to convert in milliseconds.
+ * @param {import("./initials").Scale} scale - The scale to convert the date to.
+ * @returns {string} - The converted date in the specified scale.
+ */
+export const dateToScale = (_date, scale) => {
+  const date = new Date(_date);
+  switch (scale) {
+    case "hours":
+      return date.toLocaleString();
+    case "days":
+      return date.toLocaleDateString();
+    case "weeks":
+      return date.toLocaleDateString();
+    case "months":
+      return date.toLocaleDateString();
+    default:
+      return date.toLocaleString();
+  }
+};

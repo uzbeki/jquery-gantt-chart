@@ -17,6 +17,7 @@ import {
   adjustDate,
   areDatesEqual,
   countWorkDays,
+  dateToScale,
   daysBetween,
   getMonthId,
   getNavigationValues,
@@ -787,15 +788,13 @@ function main() {
       // **Bar**
       // Return an element representing a progress of position within the entire chart
       createBar: function (day) {
-        const l = d => new Date(d).toLocaleString();
-        const bar = $(
-          `<div class="bar" title="${day.label}" data-bs-content="From ${l(day.from)} to ${l(day.to)}">
-            <div class="fn-label">${day.label}</div>
-          </div>`
-        ).data("dataObj", day);
-        new Resizer(bar.get(0), settings.barOptions.resizability);
-        new Movable(bar.get(0), settings.barOptions.movability);
-        new Tooltip(bar.get(0), { content: day.label, position: "top", title: day.label });
+        const l = d => dateToScale(d, settings.scale);
+        const bar = $(`<div class="bar"><div class="fn-label">${day.label}</div></div>`).data("dataObj", day);
+        bar.resize = new Resizer(bar.get(0), settings.barOptions.resizability);
+        bar.movable = new Movable(bar.get(0), settings.barOptions.movability);
+        const content = `${day.label} (${l(day.from)} - ${l(day.to)})`;
+        bar.tooltip = new Tooltip(bar.get(0), { content, position: "top", title: day.label });
+
         if (day.classNames) bar.addClass(day.classNames);
         bar.on("click", e => {
           e.stopPropagation();
@@ -839,8 +838,12 @@ function main() {
 
               // **Weekly data**
               case "weeks":
-                startOffset = $(element).find(`#${new Date(day.from).getWeekId()}`).data("offset");
-                endOffset = $(element).find(`#${new Date(day.to).getWeekId()}`).data("offset");
+                startOffset = $(element)
+                  .find(`#${new Date(day.from).getWeekId()}`)
+                  .data("offset");
+                endOffset = $(element)
+                  .find(`#${new Date(day.to).getWeekId()}`)
+                  .data("offset");
 
                 cellCount = Math.round((endOffset - startOffset) / cellWidth) + 1;
                 barWidth = cellWidth * cellCount;
@@ -881,9 +884,17 @@ function main() {
               const dataObj = bar.data("dataObj");
               settings.onBarResize(dataObj, e.detail.width);
               const cellsChanged = e.detail.delta / cellWidth;
+              if (cellsChanged === 0) return;
+              bar.attr('data-resized', true)
               const resizedDay = { ...dataObj, to: adjustDate(dataObj.to, cellsChanged, settings.scale) };
               bar.data("dataObj", resizedDay);
               element.data[i].values[j] = resizedDay;
+
+              const l = d => dateToScale(d, settings.scale);
+              const content = `${resizedDay.label} (${l(resizedDay.from)} - ${l(resizedDay.to)})\n${e.detail.delta > 0 ? "+" : "-"} ${Math.abs(cellsChanged)} ${settings.scale} ${
+                cellsChanged > 0 ? "forward" : "back"
+              }`;
+              bar.tooltip.refresh({ content });
             });
           });
         });
