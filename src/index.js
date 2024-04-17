@@ -19,6 +19,7 @@ import {
   getMonthId,
   getNavigationValues,
   monthsBetween,
+  sanitizeSource,
 } from "./helpers/utils.js";
 
 function main() {
@@ -121,13 +122,15 @@ function main() {
       },
 
       setData: (element, data) => {
-        element.pageNum = data.currentPage;
-        element.pageCount = data.pageCount;
-        element.totalItems = data.totalItems;
-        settings.itemsPerPage = data.itemsPerPage;
+        const { isValid, source } = sanitizeSource(data);
+        if (!isValid) throw new Error("Invalid data source");
+        element.pageNum = source.currentPage;
+        element.pageCount = source.pageCount;
+        element.totalItems = source.totalItems;
+        settings.itemsPerPage = source.itemsPerPage;
 
         const order = getOrder(`page${element.pageNum}_dragAndSortOrder`);
-        element.data = core.reOrderData(data.data, order);
+        element.data = core.reOrderData(source.data, order);
       },
 
       reOrderData: (data, _newOrder) => {
@@ -183,7 +186,7 @@ function main() {
 
         element.canScroll = $dataPanel.width() > $rightPanel.width();
 
-        content.append(core.navigation(element));
+        element.gantt.append(core.navigation(element));
 
         core.fillData(element, $dataPanel, $leftPanel);
 
@@ -809,6 +812,7 @@ function main() {
             .find("#rowheader" + entry.id)
             .data("offset");
           $.each(entry.values, function (j, day) {
+            if (!day.from || !day.to) return console.error("Invalid date range", day);
             const bar = core.createBar(day);
             let endOffset = 0,
               cellCount = 1;
@@ -939,7 +943,7 @@ function main() {
           element.preSortData = structuredClone(element.data);
           let selectedData = element.data.filter(d => selectedIds.includes(d.id));
           selectedData = selectedData.length ? selectedData : element.data;
-          let last_date = selectedData[0].values[0].to;
+          let last_date = new Date(selectedData[0].values[0].to.getTime() + 24 * 60 * 60 * 1000);
           for (let i = 0; i < selectedData.length; i++) {
             const entry = selectedData[i];
             for (let j = 0; j < entry.values.length; j++) {
@@ -1071,6 +1075,7 @@ function main() {
         var maxDate = null;
         $.each(element.data, function (i, entry) {
           $.each(entry.values, function (i, date) {
+            if (!date.to) return;
             var toDate = tools.dateDeserialize(date.to);
             if (isNaN(toDate)) {
               return;
@@ -1112,6 +1117,7 @@ function main() {
         var minDate = null;
         $.each(element.data, function (i, entry) {
           $.each(entry.values, function (i, date) {
+            if (!date.from) return;
             var fromDate = tools.dateDeserialize(date.from);
             if (isNaN(fromDate)) {
               return;
@@ -1258,35 +1264,21 @@ function main() {
         return dayMap;
       },
       // Returns true when the given date appears in the array of holidays, if provided
-      isHoliday: (function () {
-        // IIFE
-        // short-circuits the function if no holidays option was passed
-        if (!settings.holidays || !settings.holidays.length) {
-          return function () {
-            return false;
-          };
-        }
-        var holidays = false;
-        // returns the function that will be used to check for holidayness of a given date
-        return function (date) {
-          if (!holidays) {
-            holidays = tools._datesToDays(settings.holidays);
-          }
-          return !!holidays[
-            // assumes numeric dates are already normalized to start-of-day
-            $.isNumeric(date) ? date : new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime()
-          ];
+      isHoliday: function (date) {
+        if (!settings.holidays || !settings.holidays.length) return false;
+        const areDatesEqual = (date1, date2) => {
+          return (
+            date1.getDate() === date2.getDate() &&
+            date1.getMonth() === date2.getMonth() &&
+            date1.getFullYear() === date2.getFullYear()
+          );
         };
-      })(),
-
-      // Get the current cell height
-      getCellSize: function () {
-        return settings.cellSize;
+        return settings.holidays.some(holiday => areDatesEqual(date, holiday));
       },
 
-      getBarHeight: function () {
-        return tools.getCellSize() * 0.8;
-      },
+      getCellSize: () => settings.cellSize,
+
+      getBarHeight: () => tools.getCellSize() * 0.8,
 
       // Get the current page height
       // getPageHeight: function (element) {

@@ -61,8 +61,8 @@ export const initialResizerOptions = {
 
 /**
  * @typedef {Object} Value
- * @property {Date} from - Start date of the value object
- * @property {Date} to - End date of the value object
+ * @property {Date|null} from - Start date of the value object
+ * @property {Date|null} to - End date of the value object
  * @property {string} label - Label of the value object
  * @property {string} desc - Description of the value object
  * @property {string} customClass - Custom class for coloring bars
