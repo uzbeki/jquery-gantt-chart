@@ -15,7 +15,7 @@ export const daysBetween = (date1, date2) => {
 };
 
 export const monthsBetween = (_date1, _date2) => {
-  if (!date1 || !date2 || date1 === date2) return 0;
+  if (!_date1 || !_date2 || _date1 === _date2) return 0;
   const [date1, date2] = [new Date(_date1), new Date(_date2)];
   const oneMonth = 30 * 24 * 60 * 60 * 1000;
   const months = Math.ceil(Math.abs(date1 - date2) / oneMonth);
