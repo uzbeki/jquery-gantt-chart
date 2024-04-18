@@ -8,21 +8,25 @@ import { SCALES } from "./initials.js";
  * @returns {number} The number of days between the two dates.
  */
 export const daysBetween = (date1, date2) => {
+  if (!date1 || !date2 || date1 === date2) return 0;
   const oneDay = 24 * 60 * 60 * 1000;
-  const days = Math.round(Math.abs((date1 - date2) / oneDay));
-  return days + 1;
+  const days = Math.ceil(Math.abs((date1 - date2) / oneDay));
+  return days;
 };
 
 export const monthsBetween = (_date1, _date2) => {
+  if (!date1 || !date2 || date1 === date2) return 0;
   const [date1, date2] = [new Date(_date1), new Date(_date2)];
-  const months = (date2.getFullYear() - date1.getFullYear()) * 12 + (date2.getMonth() - date1.getMonth());
-  return months + 1;
+  const oneMonth = 30 * 24 * 60 * 60 * 1000;
+  const months = Math.ceil(Math.abs(date1 - date2) / oneMonth);
+  return months;
 };
 
 export const weeksBetween = (date1, date2) => {
+  if (!date1 || !date2 || date1 === date2) return 0;
   const oneWeek = 7 * 24 * 60 * 60 * 1000;
-  const weeks = Math.round(Math.abs(date1 - date2) / oneWeek);
-  return weeks + 1;
+  const weeks = Math.ceil(Math.abs(date1 - date2) / oneWeek);
+  return weeks;
 };
 
 /** @param {Date} date */
@@ -41,7 +45,6 @@ export const adjustDate = (dateToAdjust, amount, scale) => {
   switch (scale) {
     case "hours":
       // TODO: BUG, hour scale is 0, 12, and the amount is 1, it will change only by one hour
-      console.log({ date, amount, newDate: date.getHours() + amount });
       date.setHours(date.getHours() + amount);
       break;
     case "days":
@@ -268,3 +271,41 @@ export const padMinMaxDatesByScale = (minDate, maxDate, scale) => {
   }
   return [min, max];
 };
+
+
+/**
+ * Generates a range of dates based on the given minimum and maximum dates, scale, and interval.
+ *
+ * @param {Date} minDate - The minimum date of the range.
+ * @param {Date} maxDate - The maximum date of the range.
+ * @param {import("./initials.js").Scale} scale - The scale of the range (e.g., "hours", "days", "weeks", "months").
+ * @param {number} [n=1] - The interval for each step in the range.
+ * @returns {Date[]} - An array of dates representing the range.
+ */
+export const generateNScaleRange = (minDate, maxDate, scale, n=1) => {
+  const range = [];
+  if (!minDate || !maxDate || !scale) return range;
+  console.log({ minDate, maxDate, scale, n });
+  const currentDate = new Date(minDate);
+  while (currentDate <= maxDate) {
+    range.push(new Date(currentDate));
+    if (scale === "hours" || scale === "every hour") {
+      currentDate.setHours(currentDate.getHours() + n);
+    } else if (scale === "every 3 hours") {
+      currentDate.setHours(currentDate.getHours() + n * 3);
+    } else if (scale === "every 6 hours") {
+      currentDate.setHours(currentDate.getHours() + n * 6);
+    } else if (scale === "every 8 hours") {
+      currentDate.setHours(currentDate.getHours() + n * 8);
+    } else if (scale === "every 12 hours") {
+      currentDate.setHours(currentDate.getHours() + n * 12);
+    } else if (scale === "days") {
+      currentDate.setDate(currentDate.getDate() + n);
+    } else if (scale === "weeks") {
+      currentDate.setDate(currentDate.getDate() + n * 7);
+    } else if (scale === "months") {
+      currentDate.setMonth(currentDate.getMonth() + n);
+    }
+  }
+  return range;
+}
