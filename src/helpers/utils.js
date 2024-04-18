@@ -7,25 +7,46 @@ import { SCALES } from "./initials.js";
  * @param {Date} date2 - The second date.
  * @returns {number} The number of days between the two dates.
  */
-export const daysBetween = (date1, date2) => {
-  if (!date1 || !date2 || date1 === date2) return 0;
+export const daysBetween = (_date1, _date2) => {
+  if (!_date1 || !_date2 || _date1 === _date2) return 0;
+  const [date1, date2] = [new Date(_date1), new Date(_date2)];
   const oneDay = 24 * 60 * 60 * 1000;
-  const days = Math.ceil(Math.abs((date1 - date2) / oneDay));
+  const diff = Math.abs(date1 - date2);
+  if (date1.toDateString() === date2.toDateString()) return 1;
+  let days = Math.ceil(diff / oneDay);
+  // days = diff % oneDay === 0 ? days + 1 : days; // add one day if the difference is a multiple of one day, to include the last day
   return days;
 };
 
+// export const daysBetween = (_date1, _date2) => {
+//   if (!_date1 || !_date2 || _date1 === _date2) return 0;
+//   const [date1, date2] = [new Date(_date1), new Date(_date2)];
+//   // date1.setHours(0, 0, 0, 0);
+//   // date2.setHours(0, 0, 0, 0);
+//   if (date1.toDateString() === date2.toDateString()) return 1;
+//   const dates = new Set();
+//   let currentDate = new Date(date1)
+//   while (currentDate < date2) {
+//     dates.add(currentDate.toDateString());
+//     currentDate.setDate(currentDate.getDate() + 1);
+//   }
+//   return dates.size + 1;
+// };
+
 export const monthsBetween = (_date1, _date2) => {
-  if (!_date1 || !_date2 || _date1 === _date2) return 0;
+  if (!date1 || !date2 || date1 === date2) return 0;
   const [date1, date2] = [new Date(_date1), new Date(_date2)];
   const oneMonth = 30 * 24 * 60 * 60 * 1000;
-  const months = Math.ceil(Math.abs(date1 - date2) / oneMonth);
+  const diff = Math.abs(date1 - date2);
+  const months = Math.ceil(diff / oneMonth);
   return months;
 };
 
 export const weeksBetween = (date1, date2) => {
   if (!date1 || !date2 || date1 === date2) return 0;
   const oneWeek = 7 * 24 * 60 * 60 * 1000;
-  const weeks = Math.ceil(Math.abs(date1 - date2) / oneWeek);
+  const diff = Math.abs(date1 - date2);
+  const weeks = Math.ceil(diff / oneWeek);
   return weeks;
 };
 
@@ -170,12 +191,14 @@ export const sanitizeSource = source => {
         if (value.from) {
           const from = new Date(value.from);
           if (isNaN(from)) throw new Error(`Value.from must be a valid date. ${value.from}`);
+          from.setMinutes(0, 0, 0);
           value.from = from.getTime();
           if (value.from < minDate) minDate = value.from;
         }
         if (value.to) {
           const to = new Date(value.to);
           if (isNaN(to)) throw new Error(`Value.to must be a valid date. ${value.to}`);
+          to.setMinutes(0, 0, 0);
           value.to = to.getTime();
           if (value.to > maxDate) maxDate = value.to;
         }
@@ -185,7 +208,7 @@ export const sanitizeSource = source => {
   } catch (error) {
     console.error(error);
   }
-  return { isValid, source, minDate, maxDate};
+  return { isValid, source, minDate, maxDate };
 };
 
 export const areDatesEqual = (_date1, _date2) => {
@@ -210,7 +233,8 @@ export const dateToScale = (_date, scale) => {
     case "hours":
       return date.toLocaleString();
     case "days":
-      return date.toLocaleDateString();
+      // return date.toLocaleDateString();
+      return date.toLocaleString();
     case "weeks":
       return date.toLocaleDateString();
     case "months":
@@ -272,7 +296,6 @@ export const padMinMaxDatesByScale = (minDate, maxDate, scale) => {
   return [min, max];
 };
 
-
 /**
  * Generates a range of dates based on the given minimum and maximum dates, scale, and interval.
  *
@@ -282,7 +305,7 @@ export const padMinMaxDatesByScale = (minDate, maxDate, scale) => {
  * @param {number} [n=1] - The interval for each step in the range.
  * @returns {Date[]} - An array of dates representing the range.
  */
-export const generateNScaleRange = (minDate, maxDate, scale, n=1) => {
+export const generateNScaleRange = (minDate, maxDate, scale, n = 1) => {
   const range = [];
   if (!minDate || !maxDate || !scale) return range;
   console.log({ minDate, maxDate, scale, n });
@@ -308,4 +331,4 @@ export const generateNScaleRange = (minDate, maxDate, scale, n=1) => {
     }
   }
   return range;
-}
+};

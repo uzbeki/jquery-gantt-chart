@@ -51,7 +51,6 @@ export default class Tooltip {
   /** Shows the tooltip.
    * @param {MouseEvent} event - The mouse event that triggered the tooltip. */
   showTooltip(event) {
-    if (!this.isElementInViewport()) return;
     document.body.appendChild(this.tooltipElement);
 
     const elementRect = this.element.getBoundingClientRect();
@@ -79,6 +78,14 @@ export default class Tooltip {
         break;
     }
 
+    if (!this.isElementInViewport()) {
+      // If the tooltip is not in the viewport, adjust the position to fit in the viewport.
+      if (top < 0) top = 0;
+      if (left < 0) left = 0;
+      if (top + tooltipRect.height > window.innerHeight) top = window.innerHeight - tooltipRect.height;
+      if (left + tooltipRect.width > window.innerWidth) left = window.innerWidth - tooltipRect.width;
+
+    }
     this.tooltipElement.style.top = `${top}px`;
     this.tooltipElement.style.left = `${left}px`;
   }
