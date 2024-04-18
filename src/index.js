@@ -22,6 +22,7 @@ import {
   getMonthId,
   getNavigationValues,
   monthsBetween,
+  padMinMaxDatesByScale,
   sanitizeSource,
 } from "./helpers/utils.js";
 
@@ -125,8 +126,10 @@ function main() {
       },
 
       setData: (element, data) => {
-        const { isValid, source } = sanitizeSource(data);
+        const { isValid, source, minDate, maxDate } = sanitizeSource(data);
         if (!isValid) throw new Error("Invalid data source");
+        element.minDate = minDate;
+        element.maxDate = maxDate;
         element.pageNum = source.currentPage;
         element.pageCount = source.pageCount;
         element.totalItems = source.totalItems;
@@ -164,8 +167,13 @@ function main() {
         element.rowsNum = element.data.length;
         element.rowsOnLastPage = element.totalItems % settings.itemsPerPage;
 
-        element.dateStart = tools.getMinDate(element);
-        element.dateEnd = tools.getMaxDate(element);
+        // element.dateStart = tools.getMinDate(element);
+        // element.dateEnd = tools.getMaxDate(element);
+        
+        const [minDate, maxDate] = padMinMaxDatesByScale(element.minDate, element.maxDate, settings.scale);
+        console.log(`minDate: ${new Date(element.minDate)} => padded: ${minDate}\nmaxDate: ${new Date(element.maxDate)} => padded: ${maxDate}`);
+        element.dateStart = minDate;
+        element.dateEnd = maxDate;
 
         core.render(element);
       },
@@ -670,7 +678,7 @@ function main() {
           settings.onPageSizeChange(newPageSize, element.pageNum).then(data => {
             if (!data) return;
             core.setData(element, data);
-            core.render(element);
+            core.init(element);
           });
         };
         const pageBackClickHandler = e => core.navigatePage(element, -1);
@@ -1102,83 +1110,83 @@ function main() {
       },
 
       // Return the maximum available date in data depending on the scale
-      getMaxDate: function (element) {
-        var maxDate = null;
-        $.each(element.data, function (i, entry) {
-          $.each(entry.values, function (i, date) {
-            if (!date.to) return;
-            var toDate = tools.dateDeserialize(date.to);
-            if (isNaN(toDate)) {
-              return;
-            }
-            maxDate = maxDate < toDate ? toDate : maxDate;
-          });
-        });
-        maxDate = maxDate || new Date();
-        var bd;
-        switch (settings.scale) {
-          case "hours":
-            maxDate.setHours(Math.ceil(maxDate.getHours() / element.scaleStep) * element.scaleStep);
-            maxDate.setHours(maxDate.getHours() + element.scaleStep * 3);
-            break;
-          case "weeks":
-            // wtf is happening here?
-            bd = new Date(maxDate.getTime());
-            bd = new Date(bd.setDate(bd.getDate() + 3 * 7));
-            var md = Math.floor(bd.getDate() / 7) * 7;
-            maxDate = new Date(bd.getFullYear(), bd.getMonth(), md === 0 ? 4 : md - 3);
-            break;
-          case "months":
-            bd = new Date(maxDate.getFullYear(), maxDate.getMonth(), 1);
-            bd.setMonth(bd.getMonth() + 2);
-            maxDate = new Date(bd.getFullYear(), bd.getMonth(), 1);
-            break;
-          case "days":
-          /* falls through */
-          default:
-            maxDate.setHours(0);
-            maxDate.setDate(maxDate.getDate() + 3);
-        }
-        return maxDate;
-      },
+      // getMaxDate: function (element) {
+      //   var maxDate = null;
+      //   $.each(element.data, function (i, entry) {
+      //     $.each(entry.values, function (i, date) {
+      //       if (!date.to) return;
+      //       var toDate = tools.dateDeserialize(date.to);
+      //       if (isNaN(toDate)) {
+      //         return;
+      //       }
+      //       maxDate = maxDate < toDate ? toDate : maxDate;
+      //     });
+      //   });
+      //   maxDate = maxDate || new Date();
+      //   var bd;
+      //   switch (settings.scale) {
+      //     case "hours":
+      //       maxDate.setHours(Math.ceil(maxDate.getHours() / element.scaleStep) * element.scaleStep);
+      //       maxDate.setHours(maxDate.getHours() + element.scaleStep * 3);
+      //       break;
+      //     case "weeks":
+      //       // wtf is happening here?
+      //       bd = new Date(maxDate.getTime());
+      //       bd = new Date(bd.setDate(bd.getDate() + 3 * 7));
+      //       var md = Math.floor(bd.getDate() / 7) * 7;
+      //       maxDate = new Date(bd.getFullYear(), bd.getMonth(), md === 0 ? 4 : md - 3);
+      //       break;
+      //     case "months":
+      //       bd = new Date(maxDate.getFullYear(), maxDate.getMonth(), 1);
+      //       bd.setMonth(bd.getMonth() + 2);
+      //       maxDate = new Date(bd.getFullYear(), bd.getMonth(), 1);
+      //       break;
+      //     case "days":
+      //     /* falls through */
+      //     default:
+      //       maxDate.setHours(0);
+      //       maxDate.setDate(maxDate.getDate() + 3);
+      //   }
+      //   return maxDate;
+      // },
 
       // Return the minimum available date in data depending on the scale
-      getMinDate: function (element) {
-        // TODO: count be done in a more efficient way
-        var minDate = null;
-        $.each(element.data, function (i, entry) {
-          $.each(entry.values, function (i, date) {
-            if (!date.from) return;
-            var fromDate = tools.dateDeserialize(date.from);
-            if (isNaN(fromDate)) {
-              return;
-            }
-            minDate = minDate > fromDate || minDate === null ? fromDate : minDate;
-          });
-        });
-        minDate = minDate || new Date();
-        switch (settings.scale) {
-          case "hours":
-            minDate.setHours(Math.floor(minDate.getHours() / element.scaleStep) * element.scaleStep);
-            minDate.setHours(minDate.getHours() - element.scaleStep * 3);
-            break;
-          case "weeks":
-            minDate.setHours(0, 0, 0, 0);
-            minDate.setDate(minDate.getDate() - 3 * 7);
-            break;
-          case "months":
-            minDate.setHours(0, 0, 0, 0);
-            minDate.setDate(1);
-            minDate.setMonth(minDate.getMonth() - 3);
-            break;
-          case "days":
-          /* falls through */
-          default:
-            minDate.setHours(0, 0, 0, 0);
-            minDate.setDate(minDate.getDate() - 3);
-        }
-        return minDate;
-      },
+      // getMinDate: function (element) {
+      //   // TODO: count be done in a more efficient way
+      //   var minDate = null;
+      //   $.each(element.data, function (i, entry) {
+      //     $.each(entry.values, function (i, date) {
+      //       if (!date.from) return;
+      //       var fromDate = tools.dateDeserialize(date.from);
+      //       if (isNaN(fromDate)) {
+      //         return;
+      //       }
+      //       minDate = minDate > fromDate || minDate === null ? fromDate : minDate;
+      //     });
+      //   });
+      //   minDate = minDate || new Date();
+      //   switch (settings.scale) {
+      //     case "hours":
+      //       minDate.setHours(Math.floor(minDate.getHours() / element.scaleStep) * element.scaleStep);
+      //       minDate.setHours(minDate.getHours() - element.scaleStep * 3);
+      //       break;
+      //     case "weeks":
+      //       minDate.setHours(0, 0, 0, 0);
+      //       minDate.setDate(minDate.getDate() - 3 * 7);
+      //       break;
+      //     case "months":
+      //       minDate.setHours(0, 0, 0, 0);
+      //       minDate.setDate(1);
+      //       minDate.setMonth(minDate.getMonth() - 3);
+      //       break;
+      //     case "days":
+      //     /* falls through */
+      //     default:
+      //       minDate.setHours(0, 0, 0, 0);
+      //       minDate.setDate(minDate.getDate() - 3);
+      //   }
+      //   return minDate;
+      // },
 
       // Return an array of Date objects between `from` and `to`
       generateDateRange: function (from, to) {

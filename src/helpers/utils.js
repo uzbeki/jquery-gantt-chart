@@ -124,10 +124,12 @@ export const getNavigationValues = (target, scale, cellSize) => {
 /**
  * Validates the source object.
  * @param {import("./initials.js").Source} source - The source object to validate.
- * @returns {{isValid:boolean, source:import("./initials.js").Source}} - The validation result.
+ * @returns {{isValid:boolean, source:import("./initials.js").Source, minDate: number, maxDate: number}} - The validation result.
  */
 export const sanitizeSource = source => {
   let isValid = false;
+  let minDate = Infinity;
+  let maxDate = -Infinity;
   try {
     if (!source) throw new Error("Source object is required.");
     if (!source.data || !source.currentPage || !source.itemsPerPage || !source.pageCount) {
@@ -149,6 +151,7 @@ export const sanitizeSource = source => {
     if (source.pageCount < 1) throw new Error(`Page count cannot be less than 1. ${source.pageCount}`);
     if (!Array.isArray(source.data)) throw new Error(`Source.data must be an array. ${source.data}`);
     if (source.data.length < 1) throw new Error(`Source.data must contain at least one item. ${source.data}`);
+
     source.data.forEach(item => {
       if (!item.id || !item.name || !item.values) {
         throw new Error(
@@ -161,21 +164,25 @@ export const sanitizeSource = source => {
         );
       }
       item.values.forEach(value => {
-        if (value.from && isNaN(new Date(value.from).getTime())) {
-          throw new Error(`Value.from must be a valid date. ${value.from}`);
+        if (value.from) {
+          const from = new Date(value.from);
+          if (isNaN(from)) throw new Error(`Value.from must be a valid date. ${value.from}`);
+          value.from = from.getTime();
+          if (value.from < minDate) minDate = value.from;
         }
-        if (value.to && isNaN(new Date(value.to).getTime())) {
-          throw new Error(`Value.to must be a valid date. ${value.to}`);
+        if (value.to) {
+          const to = new Date(value.to);
+          if (isNaN(to)) throw new Error(`Value.to must be a valid date. ${value.to}`);
+          value.to = to.getTime();
+          if (value.to > maxDate) maxDate = value.to;
         }
-        value.from = value.from ? new Date(value.from).getTime() : null;
-        value.to = value.to ? new Date(value.to).getTime() : null;
       });
     });
     isValid = true;
   } catch (error) {
     console.error(error);
   }
-  return { isValid, source };
+  return { isValid, source, minDate, maxDate};
 };
 
 export const areDatesEqual = (_date1, _date2) => {
@@ -208,4 +215,56 @@ export const dateToScale = (_date, scale) => {
     default:
       return date.toLocaleString();
   }
+};
+
+/**
+ * gets the minimum and maximum dates from the source
+ * @param {import("./initials").SourceData} data */
+export const getMinMaxDates = data => {
+  let minDate = Infinity;
+  let maxDate = -Infinity;
+  data.forEach(item => {
+    item.values.forEach(value => {
+      if (value.from && value.from < minDate) minDate = value.from;
+      if (value.to && value.to > maxDate) maxDate = value.to;
+    });
+  });
+  return [new Date(minDate), new Date(maxDate)];
+};
+
+/**
+ *
+ * @param {Date} minDate
+ * @param {Date} maxDate
+ * @param {import("./initials.js").Scale} scale
+ * @returns {[Date, Date]} */
+export const padMinMaxDatesByScale = (minDate, maxDate, scale) => {
+  const [min, max] = [new Date(minDate), new Date(maxDate)];
+  const PAD_AMOUNT = 5; // pad by 5 cells
+  if (scale === "every hour" || scale === "hours") {
+    min.setHours(min.getHours() - PAD_AMOUNT);
+    max.setHours(max.getHours() + PAD_AMOUNT);
+  } else if (scale === "every 3 hours") {
+    min.setHours(min.getHours() - PAD_AMOUNT * 3);
+    max.setHours(max.getHours() + PAD_AMOUNT * 3);
+  } else if (scale === "every 6 hours") {
+    min.setHours(min.getHours() - PAD_AMOUNT * 6);
+    max.setHours(max.getHours() + PAD_AMOUNT * 6);
+  } else if (scale === "every 8 hours") {
+    min.setHours(min.getHours() - PAD_AMOUNT * 8);
+    max.setHours(max.getHours() + PAD_AMOUNT * 8);
+  } else if (scale === "half days") {
+    min.setHours(min.getHours() - PAD_AMOUNT * 12);
+    max.setHours(max.getHours() + PAD_AMOUNT * 12);
+  } else if (scale === "days") {
+    min.setDate(min.getDate() - PAD_AMOUNT);
+    max.setDate(max.getDate() + PAD_AMOUNT);
+  } else if (scale === "weeks") {
+    min.setDate(min.getDate() - PAD_AMOUNT * 7);
+    max.setDate(max.getDate() + PAD_AMOUNT * 7);
+  } else if (scale === "months") {
+    min.setMonth(min.getMonth() - PAD_AMOUNT);
+    max.setMonth(max.getMonth() + PAD_AMOUNT);
+  }
+  return [min, max];
 };
