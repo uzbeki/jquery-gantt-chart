@@ -127,5 +127,22 @@ export const NAVIGATION_TEMPLATE = `
             </button>
         </div>
     </div>
+    <section class="nav-holidays-input">
+        <form method='post' id='csvForm'>
+            <div class="form-group">
+            <label for="csv">Upload Holidays CSV</label>
+                <input type="file" name="csv" id="csv" accept=".csv" required/>
+            </div>
+            <button type="submit">Upload CSV</button>
+        </form>
+        <a href="https://www8.cao.go.jp/chosei/shukujitsu/syukujitsu.csv" target="_blank" rel="noopener noreferrer" download>Sample</a>
+    </section>
 </div>
 `;
+
+export const header_year = (width, year) => `<div class="row year" style="width: ${width}px">
+<div class="fn-label">${year}</div></div>`;
+
+export const header_month = (width, month) => `<div class="row month" style="width: ${width}px">
+<div class="fn-label">${month}</div>
+</div>`

@@ -144,7 +144,7 @@ class DragAndSortManager {
     }
     const order = this.__getOrder();
     if (!order.length) return;
-    const draggables = order.map(id => document.getElementById(id));
+    const draggables = order.map(id => document.getElementById(id)).filter(Boolean);
     const draggableIds = draggables.map(d => d.id);
     
     // check if the number of draggable elements is the same as the saved order

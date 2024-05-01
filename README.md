@@ -103,7 +103,7 @@ Simply include the plugin and its stylesheet in your html file and call it on a 
 - `zoomLevelKey` - key to save zoom level, defaults to `jquery-gantt-chart-zoom-level`
 - `rememberZoomLevel` - remember current zoom level, defaults to `true`
 - `rememberHeaderOrder` - remember header order, defaults to `true`
-- `scale` - scale type (hours, days, weeks, months), defaults to `days`
+- `scale` - scale type (`"months" | "weeks" | "days" | "half days" | "every 8 hours" | "every 6 hours" | "every 3 hours" | "every hour"`), defaults to `days`
 - `maxScale` - maximum scale, defaults to `months`
 - `minScale` - minimum scale, defaults to `hours`
 - `cellSize` - cell size in pixels, defaults to `24`

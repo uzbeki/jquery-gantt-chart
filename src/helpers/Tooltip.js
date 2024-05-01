@@ -7,7 +7,7 @@
  */
 
 /** @type {TooltipOptions} */
-const initialTooltipOptions = { title: "", content: "", position: "top", space: 15, delay: 0 };
+const initialTooltipOptions = { title: "", content: "", position: "top", space: 20, delay: 0 };
 
 /**
  * Represents a Tooltip.
@@ -51,41 +51,46 @@ export default class Tooltip {
   /** Shows the tooltip.
    * @param {MouseEvent} event - The mouse event that triggered the tooltip. */
   showTooltip(event) {
+    event.preventDefault();
+    // console.log("showTooltip", event.pageX, event.pageY);
     document.body.appendChild(this.tooltipElement);
 
-    const elementRect = this.element.getBoundingClientRect();
+    // const elementRect = this.element.getBoundingClientRect();
     const tooltipRect = this.tooltipElement.getBoundingClientRect();
 
-    let top = 0;
-    let left = 0;
+    let top = event.pageY - tooltipRect.height - this.options.space;
+    let left = event.pageX;
 
-    switch (this.options.position) {
-      case "left":
-        top = elementRect.top + elementRect.height / 2 - tooltipRect.height / 2;
-        left = elementRect.left - tooltipRect.width - this.options.space;
-        break;
-      case "right":
-        top = elementRect.top + elementRect.height / 2 - tooltipRect.height / 2;
-        left = elementRect.right + this.options.space;
-        break;
-      case "top":
-        top = elementRect.top - tooltipRect.height - this.options.space;
-        left = elementRect.left + elementRect.width / 2 - tooltipRect.width / 2;
-        break;
-      case "bottom":
-        top = elementRect.bottom + this.options.space;
-        left = elementRect.left + elementRect.width / 2 - tooltipRect.width / 2;
-        break;
-    }
+    // switch (this.options.position) {
+    //   case "left":
+    //     // top = elementRect.top + elementRect.height / 2 - tooltipRect.height / 2;
+    //     top = event.pageY + elementRect.height / 2 - tooltipRect.height / 2;
+    //     left = elementRect.left - tooltipRect.width - this.options.space;
+    //     break;
+    //   case "right":
+    //     // top = elementRect.top + elementRect.height / 2 - tooltipRect.height / 2;
+    //     top = event.pageY + elementRect.height / 2 - tooltipRect.height / 2;
+    //     left = elementRect.right + this.options.space;
+    //     break;
+    //   case "top":
+    //     // top = elementRect.top - tooltipRect.height - this.options.space;
+    //     top = event.pageY - tooltipRect.height - this.options.space;
+    //     left = elementRect.left + elementRect.width / 2 - tooltipRect.width / 2;
+    //     break;
+    //   case "bottom":
+    //     top = event.pageY + this.options.space;
+    //     left = elementRect.left + elementRect.width / 2 - tooltipRect.width / 2;
+    //     break;
+    // }
 
-    if (!this.isElementInViewport()) {
-      // If the tooltip is not in the viewport, adjust the position to fit in the viewport.
-      if (top < 0) top = 0;
-      if (left < 0) left = 0;
-      if (top + tooltipRect.height > window.innerHeight) top = window.innerHeight - tooltipRect.height;
-      if (left + tooltipRect.width > window.innerWidth) left = window.innerWidth - tooltipRect.width;
-
-    }
+    // if (!this.isElementInViewport()) {
+    //   // If the tooltip is not in the viewport, adjust the position to fit in the viewport.
+    //   console.log("not in viewport", { top, left });
+    //   if (top < 0) top = 0;
+    //   if (left < 0) left = 0;
+    //   // if (top + tooltipRect.height > window.innerHeight) top = window.innerHeight - tooltipRect.height;
+    //   if (left + tooltipRect.width > window.innerWidth) left = window.innerWidth - tooltipRect.width;
+    // }
     this.tooltipElement.style.top = `${top}px`;
     this.tooltipElement.style.left = `${left}px`;
   }
@@ -111,7 +116,6 @@ export default class Tooltip {
    * Refreshes the tooltip with new options.
    * @param {TooltipOptions} options - The options for the tooltip. */
   refresh(options) {
-    console.log("refresh", options);
     this.options = { ...this.options, ...options };
     this.tooltipElement.innerHTML = `
             <h3 class="tooltip-title">${this.options.title}</h3>

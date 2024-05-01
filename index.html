@@ -40,6 +40,10 @@
     </head>
 
     <body>
+        <section style='height: 1000px;'></section>
+        <section style='height: 1000px;'></section>
+        <section style='height: 1000px;'></section>
+        <section style='height: 1000px;'></section>
         <h1>Gantt Chart as jQuery Component demo</h1>
         <p>Simple and fast plugin to create gantt charts for modern browsers</p>
         <div id="gantt"></div>
@@ -69,11 +73,11 @@
         </section>
 
         <script type='module'>
-            import { getRandomData } from "./src/dummyData/index.js";
+            import { getRandomData, getTestPlanData, getScheduleData } from "./src/dummyData/index.js";
             import holidays from "./src/dummyData/holidays.js";
 
             const dataGenerator = getRandomData;
-            dataGenerator(1, 20).then(data => {
+            dataGenerator(1, 10).then(data => {
                 console.log(data);
                 $("#gantt").gantt({
                     source: data,
@@ -89,7 +93,7 @@
                             vertical: false,
                         },
                     },
-                    holidays: Object.keys(holidays).map(h => new Date(h)),
+                    // holidays: Object.keys(holidays).map(h => new Date(h)),
                     onItemClick: console.log,
                     onAddClick: console.log,
                     onRender: () => console.log("chart rendered"),

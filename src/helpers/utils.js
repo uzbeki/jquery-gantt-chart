@@ -1,5 +1,3 @@
-import { SCALES } from "./initials.js";
-
 /**
  * Calculates the number of days between two dates.
  *
@@ -8,6 +6,7 @@ import { SCALES } from "./initials.js";
  * @returns {number} The number of days between the two dates.
  */
 export const daysBetween = (_date1, _date2) => {
+  // TODO: faulty logic, need to fix, not used currently
   if (!_date1 || !_date2 || _date1 === _date2) return 0;
   const [date1, date2] = [new Date(_date1), new Date(_date2)];
   const oneDay = 24 * 60 * 60 * 1000;
@@ -34,7 +33,8 @@ export const daysBetween = (_date1, _date2) => {
 // };
 
 export const monthsBetween = (_date1, _date2) => {
-  if (!date1 || !date2 || date1 === date2) return 0;
+  // TODO: faulty logic, need to fix, not used currently
+  if (!_date1 || !_date2 || _date1 === _date2) return 0;
   const [date1, date2] = [new Date(_date1), new Date(_date2)];
   const oneMonth = 30 * 24 * 60 * 60 * 1000;
   const diff = Math.abs(date1 - date2);
@@ -65,8 +65,13 @@ export const adjustDate = (dateToAdjust, amount, scale) => {
   const date = new Date(dateToAdjust);
   switch (scale) {
     case "hours":
-      // TODO: BUG, hour scale is 0, 12, and the amount is 1, it will change only by one hour
-      date.setHours(date.getHours() + amount);
+    case "every hour":
+    case "every 3 hours":
+    case "every 6 hours":
+    case "every 8 hours":
+    case "half days":
+      const step = SCALE_HOUR_STEPS[scale];
+      date.setHours(date.getHours() + amount * step);
       break;
     case "days":
       date.setDate(date.getDate() + amount);
@@ -84,24 +89,6 @@ export const adjustDate = (dateToAdjust, amount, scale) => {
       break;
   }
   return date;
-};
-
-/**
- *
- * @param {import("./initials").Scale} scale
- * @param {boolean} zoomIn
- */
-export const getNextScale = (scale, zoomIn) => {
-  const index = SCALES.indexOf(scale);
-  return SCALES[index + (zoomIn ? -1 : 1)] || scale;
-};
-
-export const canChangeScale = (nextScale, minScale, maxScale, zoomIn) => {
-  if (zoomIn) {
-    return SCALES.indexOf(nextScale) >= SCALES.indexOf(minScale);
-  }
-  return SCALES.indexOf(nextScale) <= SCALES.indexOf(maxScale);
-  // return ["months", "weeks", "days"].includes(nextScale);
 };
 
 /**
@@ -142,7 +129,8 @@ export const getNavigationValues = (target, scale, cellSize) => {
     nextDay: { hours: -4, days: -7, weeks: -4, months: -3 },
   };
 
-  return navigationValues[target][scale] * cellSize || 0;
+  const def = navigationValues[target].weeks * cellSize; // default value
+  return navigationValues[target][scale] * cellSize || def;
 };
 
 /**
@@ -230,16 +218,11 @@ export const dateToScale = (_date, scale) => {
   if (!_date) return "";
   const date = new Date(_date);
   switch (scale) {
-    case "hours":
-      return date.toLocaleString();
-    case "days":
-      // return date.toLocaleDateString();
-      return date.toLocaleString();
     case "weeks":
       return date.toLocaleDateString();
     case "months":
       return date.toLocaleDateString();
-    default:
+    default: // hours, days
       return date.toLocaleString();
   }
 };
@@ -320,7 +303,7 @@ export const generateNScaleRange = (minDate, maxDate, scale, n = 1) => {
       currentDate.setHours(currentDate.getHours() + n * 6);
     } else if (scale === "every 8 hours") {
       currentDate.setHours(currentDate.getHours() + n * 8);
-    } else if (scale === "every 12 hours") {
+    } else if (scale === "half days") {
       currentDate.setHours(currentDate.getHours() + n * 12);
     } else if (scale === "days") {
       currentDate.setDate(currentDate.getDate() + n);
@@ -331,4 +314,121 @@ export const generateNScaleRange = (minDate, maxDate, scale, n = 1) => {
     }
   }
   return range;
+};
+
+export const parseCSVDates = async file => {
+  const reader = new FileReader();
+  return new Promise((resolve, reject) => {
+    reader.onload = event => {
+      const csvString = event.target.result;
+      const dates = csvString
+        .split("\n")
+        .map(l => new Date(l.split(",")[0]))
+        .filter(d => d && !isNaN(d));
+      resolve(dates);
+    };
+    reader.onerror = error => {
+      reject(error);
+    };
+    reader.readAsText(file);
+  });
+};
+
+/**
+ * Returns one scale unit based on the current scale.
+ *
+ * @param {import("./initials").Scale} scale
+ * @returns {number} next cell value
+ */
+export const getOneScaleValue = scale => {
+  if (scale === "hours") return 60 * 60 * 1000;
+  if (scale === "every hour") return 60 * 60 * 1000;
+  if (scale === "every 3 hours") return 3 * 60 * 60 * 1000;
+  if (scale === "every 6 hours") return 6 * 60 * 60 * 1000;
+  if (scale === "every 8 hours") return 8 * 60 * 60 * 1000;
+  if (scale === "half days") return 12 * 60 * 60 * 1000;
+  if (scale === "days") return 24 * 60 * 60 * 1000;
+  if (scale === "weeks") return 7 * 24 * 60 * 60 * 1000;
+  if (scale === "months") return 30 * 24 * 60 * 60 * 1000; // TODO BUG: months are not fixed
+  return 60 * 60 * 1000;
+};
+
+export const SCALE_HOUR_STEPS = {
+  hours: 1,
+  "every hour": 1,
+  "every 3 hours": 3,
+  "every 6 hours": 6,
+  "every 8 hours": 8,
+  "half days": 12,
+};
+
+/** @type {Record<import("./initials.js").Scale, number>} */
+export const SCALE_HEADER_COUNT = {
+  months: 2,
+  weeks: 3,
+  days: 4,
+  "half days": 5,
+  "every 8 hours": 5,
+  "every 6 hours": 5,
+  "every 3 hours": 5,
+  "every hour": 5,
+  hours: 5,
+};
+
+// ORDER MATTERS as it is used in the zoom in/out buttons, descending order
+export const HOUR_SCALES = ["half days", "every 8 hours", "every 6 hours", "every 3 hours", "every hour"];
+
+/** @type {import("./initials").Scale[]} */
+export const NEW_SCALES = ["months", "weeks", "days", ...HOUR_SCALES];
+
+/**
+ * Returns one scale unit based on the current scale.
+ *
+ * @param {import("./initials").Scale} _scale
+ * @param {boolean} zoomIn
+ * @returns {{nextScale: import("./initials").Scale | undefined, headers: number | undefined}} next scale value or undefined if not found
+ */
+export const getNextZoomScale = (_scale, zoomIn) => {
+  if (!_scale) return { nextScale: undefined, headers: undefined}
+  const scale = _scale === "hours" ? "every hour" : _scale;
+  const index = NEW_SCALES.indexOf(scale);
+  const res = NEW_SCALES[index + (zoomIn ? 1 : -1)];
+  console.log({ scale, zoomIn, res, headers: SCALE_HEADER_COUNT[res] });
+  return { nextScale: res, headers: SCALE_HEADER_COUNT[res] };
+};
+
+export const getHourlyTimeRange = (from, to, step = 1) => {
+  const year = from.getFullYear();
+  const month = from.getMonth();
+  const date = from.getDate();
+  const hour = from.getHours() - (from.getHours() % step); // round down to the nearest step
+  const range = [];
+  let h = 0,
+    i = 0;
+  do {
+    range[i] = new Date(year, month, date, hour + h++ * step);
+    // overwrite any hours repeated due to DST changes
+    if (i > 0 && range[i].getHours() === range[i - 1].getHours()) {
+      i--;
+    }
+  } while (range[i++] < to);
+  return range;
+};
+
+/**
+ * Returns the difference between the two values, scaled by the given scale.
+ * @param {number} original - The original value.
+ * @param {number} changed - The changed value.
+ * @param {import("./initials").Scale} scale - The scale by which to adjust the difference.
+ * @returns {number} - The scaled difference.
+ */
+export const getScaledDifference = (original, changed, scale) => {
+  const diff = changed - original;
+  if (HOUR_SCALES.includes(scale)) {
+    // hour_scales are in hours, so we need to convert the difference to hours without steps
+    const oneScale = getOneScaleValue("every hour");
+    return `${Math.round(diff / oneScale)} hours`;
+  }
+  const oneScale = getOneScaleValue(scale);
+  return `${Math.round(diff / oneScale)} ${scale}`;
 };

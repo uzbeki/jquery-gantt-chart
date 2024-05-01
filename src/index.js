@@ -12,18 +12,22 @@ import Resizer from "./helpers/Resizer.js";
 import Tooltip from "./helpers/Tooltip.js";
 import DragAndSort, { getOrder } from "./helpers/index.js";
 import { initialSettings } from "./helpers/initials.js";
-import { NAVIGATION_TEMPLATE } from "./helpers/templates.js";
+import { NAVIGATION_TEMPLATE, header_month, header_year } from "./helpers/templates.js";
 import {
+  HOUR_SCALES,
+  SCALE_HEADER_COUNT,
+  SCALE_HOUR_STEPS,
   adjustDate,
   areDatesEqual,
   countWorkDays,
   dateToScale,
-  daysBetween,
   getMonthId,
   getNavigationValues,
-  monthsBetween,
-  padMinMaxDatesByScale,
-  sanitizeSource,
+  getNextZoomScale,
+  getOneScaleValue,
+  getScaledDifference,
+  parseCSVDates,
+  sanitizeSource
 } from "./helpers/utils.js";
 
 function main() {
@@ -103,7 +107,6 @@ function main() {
   };
 
   $.fn.gantt = function (options) {
-    var scales = ["hours", "days", "weeks", "months"];
     //Default settings
     var settings = initialSettings;
     // read options
@@ -135,6 +138,7 @@ function main() {
         element.totalItems = source.totalItems;
         settings.itemsPerPage = source.itemsPerPage;
 
+        element.originalData = structuredClone(source.data);
         const order = getOrder(`page${element.pageNum}_dragAndSortOrder`);
         element.data = core.reOrderData(source.data, order);
       },
@@ -250,7 +254,7 @@ function main() {
       dataPanel: function (element, width) {
         var dataPanel = $('<div class="dataPanel" style="width: ' + width + 'px;"/>');
 
-        $(element).on("wheel", e => element.canScroll && core.wheelScroll(element, e));
+        $(element).on("wheel", e => core.wheelScroll(element, e));
 
         // Handle click events and dispatch to registered `onAddClick` function
         dataPanel.on("click", e => {
@@ -263,6 +267,11 @@ function main() {
               corrY = tools.getCellSize();
               break;
             case "hours":
+            case "every hour":
+            case "every 3 hours":
+            case "every 6 hours":
+            case "every 8 hours":
+            case "half days":
               corrY = tools.getCellSize() * 4;
               break;
             case "days":
@@ -341,8 +350,15 @@ function main() {
         // Setup the headings based on the chosen `settings.scale`
         switch (settings.scale) {
           // **Hours**
+          case "half days":
+          case "every 8 hours":
+          case "every 6 hours":
+          case "every 3 hours":
+          case "every hour":
           case "hours":
-            range = tools.parseTimeRange(element.dateStart, element.dateEnd, element.scaleStep);
+            const step = SCALE_HOUR_STEPS[settings.scale];
+            // range = getHourlyTimeRange(element.dateStart, element.dateEnd, step);
+            range = tools.parseTimeRange(element.dateStart, element.dateEnd, step);
             dataPanelWidth = range.length * tools.getCellSize();
 
             year = range[0].getFullYear();
@@ -355,11 +371,7 @@ function main() {
               // Fill years
               var rfy = rday.getFullYear();
               if (rfy !== year) {
-                yearArr.push(
-                  `<div class="row year" style="width: ${tools.getCellSize() * scaleUnitsThisYear}px">
-                        <div class="fn-label">${year}</div>
-                      </div>`
-                );
+                yearArr.push(header_year(tools.getCellSize() * scaleUnitsThisYear, year));
 
                 year = rfy;
                 scaleUnitsThisYear = 0;
@@ -369,11 +381,7 @@ function main() {
               // Fill months
               var rm = rday.getMonth();
               if (rm !== month) {
-                monthArr.push(
-                  `<div class="row month" style="width: ${tools.getCellSize() * scaleUnitsThisMonth}px">
-                        <div class="fn-label">${settings.months[month]}</div>
-                      </div>`
-                );
+                monthArr.push(header_month(tools.getCellSize() * scaleUnitsThisMonth, settings.months[month]));
 
                 month = rm;
                 scaleUnitsThisMonth = 0;
@@ -740,6 +748,16 @@ function main() {
           .end()
           .find("#zoom-out")
           .on("click", zoomOutClickHandler)
+          .end()
+          .find("#csvForm")
+          .on("submit", async e => {
+            e.preventDefault();
+            const file = e.target.csv.files[0];
+            const holidays = await parseCSVDates(file);
+            if (!holidays || !holidays.length) return;
+            settings.holidays = holidays;
+            core.render(element);
+          })
           .end();
         core.progressBarHandlers(element, ganttNavigate);
         return $('<div class="bottom"></div>').append(ganttNavigate);
@@ -797,7 +815,7 @@ function main() {
        * Return an element representing a progress of position within the entire chart
        * @param {import("./helpers/initials.js").Value} day */
       createBar: function (day) {
-        const bar = $(`<div class="bar"><div class="fn-label">${day.label}</div></div>`).data("dataObj", day);
+        const bar = $(`<div class="bar"><div class="fn-label">${day.label}</div></div>`);
 
         if (!day.from) bar.addClass("noStart");
         if (!day.to) bar.addClass("noEnd");
@@ -829,6 +847,8 @@ function main() {
             if (!day.from && !day.to) return;
 
             const bar = core.createBar(day);
+            const originalBarData = element.originalData?.find(e => e.id === entry.id)?.values[j];
+            bar.data("dataObj", { ...day, originalBarData: originalBarData });
             let endOffset = 0,
               cellCount = 1;
             let headerCount = 1,
@@ -847,9 +867,15 @@ function main() {
             switch (settings.scale) {
               // **Hourly data**
               case "hours":
-                const dFrom = tools.genId(tools.dateDeserialize(day.from || dummyDate), element.scaleStep);
+              case "every hour":
+              case "every 3 hours":
+              case "every 6 hours":
+              case "every 8 hours":
+              case "half days":
+                const step = SCALE_HOUR_STEPS[settings.scale];
+                const dFrom = tools.genId(tools.dateDeserialize(day.from || dummyDate), step);
                 const from = $(element).find("#dh-" + dFrom);
-                const dTo = tools.genId(tools.dateDeserialize(day.to || dummyDate), element.scaleStep);
+                const dTo = tools.genId(tools.dateDeserialize(day.to || dummyDate), step);
                 const to = $(element).find("#dh-" + dTo);
                 startOffset = from.data("offset");
                 endOffset = to.data("offset");
@@ -878,7 +904,10 @@ function main() {
                 startOffset = $(element)
                   .find(`#dh-${getMonthId(new Date(day.from || dummyDate))}`)
                   .data("offset");
-                cellCount = monthsBetween(day.from || dummyDate, day.to || dummyDate);
+                endOffset = $(element)
+                  .find(`#dh-${getMonthId(new Date(day.to || dummyDate))}`)
+                  .data("offset");
+                cellCount = Math.floor((endOffset - startOffset) / cellWidth) + 1;
                 barWidth = cellWidth * cellCount;
                 headerCount = 2;
                 break;
@@ -887,17 +916,21 @@ function main() {
               case "days":
               /* falls through */
               default:
-                cellCount = daysBetween(day.from || dummyDate, day.to || dummyDate);
-                barWidth = cellWidth * cellCount;
                 startOffset = $(element)
                   .find("#dh-" + tools.genId(day.from || dummyDate))
                   .data("offset");
+                endOffset = $(element)
+                  .find("#dh-" + tools.genId(day.to || dummyDate))
+                  .data("offset");
+                cellCount = Math.floor((endOffset - startOffset) / cellWidth) + 1;
+                barWidth = cellWidth * cellCount;
+
                 headerCount = 4;
 
-                console.log(
-                  `label: ${day.label}, from: ${day.from}, to: ${day.to}, cellCount: ${cellCount}`,
-                  new Date(new Date(day.from).setDate(new Date(day.from).getDate() + cellCount))
-                );
+              // console.log(
+              //   `label: ${day.label}, from: ${day.from}, to: ${day.to}, cellCount: ${cellCount}`,
+              //   new Date(new Date(day.from).setDate(new Date(day.from).getDate() + cellCount))
+              // );
             }
 
             bar.css({
@@ -907,20 +940,47 @@ function main() {
             });
             datapanel.append(bar);
 
+            // bar.on("resize", e => {
+            //   const l = d => dateToScale(d, settings.scale);
+            //   const dataObj = bar.data("dataObj");
+            //   // console.log("dataObj", dataObj);
+
+            //   const cellsChanged = Math.ceil(e.detail.delta / cellWidth);
+            //   if (cellsChanged === 0) return;
+            //   settings.onBarResize(dataObj, e.detail.width);
+            //   const resizedDay = { ...dataObj, to: adjustDate(dataObj.to, cellsChanged, settings.scale) };
+            //   const has_original_data_changed =
+            //     resizedDay.originalBarData && l(resizedDay.originalBarData.to) !== l(resizedDay.to);
+            //   bar.attr("data-resized", has_original_data_changed);
+            //   bar.data("dataObj", resizedDay);
+            //   element.data[i].values[j] = resizedDay;
+
+            //   const content = has_original_data_changed
+            //     ? `${resizedDay.label} (${l(resizedDay.from)} - ${l(resizedDay.to)})\n${cellsChanged} ${settings.scale}`
+            //     : `${resizedDay.label} (${l(resizedDay.from)} - ${l(resizedDay.to)})`;
+            //   bar.tooltip.refresh({ content });
+            // });
             bar.on("resize", e => {
+              const l = d => dateToScale(d, settings.scale);
               const dataObj = bar.data("dataObj");
-              settings.onBarResize(dataObj, e.detail.width);
-              const cellsChanged = e.detail.delta / cellWidth;
+              // console.log("dataObj", dataObj);
+
+              const cellsChanged = Math.ceil(e.detail.delta / cellWidth);
               if (cellsChanged === 0) return;
-              bar.attr("data-resized", true);
+              
+              settings.onBarResize(dataObj, e.detail.width);
               const resizedDay = { ...dataObj, to: adjustDate(dataObj.to, cellsChanged, settings.scale) };
+              const has_original_data_changed =
+                resizedDay.originalBarData && l(resizedDay.originalBarData.to) !== l(resizedDay.to);
+              bar.attr("data-resized", has_original_data_changed);
               bar.data("dataObj", resizedDay);
               element.data[i].values[j] = resizedDay;
 
-              const l = d => dateToScale(d, settings.scale);
-              const content = `${resizedDay.label} (${l(resizedDay.from)} - ${l(resizedDay.to)})\n${
-                e.detail.delta > 0 ? "+" : "-"
-              } ${Math.abs(cellsChanged)} ${settings.scale} ${cellsChanged > 0 ? "forward" : "back"}`;
+              const difference = getScaledDifference(resizedDay.originalBarData.to, resizedDay.to, settings.scale);
+
+              const content = has_original_data_changed
+                ? `${resizedDay.label} (${l(resizedDay.from)} - ${l(resizedDay.to)})\n${difference}`
+                : `${resizedDay.label} (${l(resizedDay.from)} - ${l(resizedDay.to)})`;
               bar.tooltip.refresh({ content });
             });
           });
@@ -989,14 +1049,16 @@ function main() {
           selectedData.forEach(entry => {
             entry.values.forEach(val => {
               if (!val.from || !val.to) return; // skip bars with no start or end date
+              const ONE_CELL_VALUE = getOneScaleValue(settings.scale);
+              // console.log(`ONE_CELL_VALUE: ${ONE_CELL_VALUE}, scale: ${settings.scale}`);
               if (!last_date) {
-                last_date = val.to + 1 * 60 * 60 * 1000; // add an hour to the first date
-                return
+                last_date = val.to + ONE_CELL_VALUE; // add an hour to the first date
+                return;
               }
               const diff = val.to - val.from;
               val.from = last_date;
               val.to = last_date + diff;
-              last_date = val.to + 1 * 60 * 60 * 1000; // add an hour to the last date
+              last_date = val.to + ONE_CELL_VALUE; // add an hour to the last date
             });
           });
           const startDate = new Date(selectedData[0].values[0].from);
@@ -1019,49 +1081,11 @@ function main() {
       // Change zoom level
       zoomInOut: function (element, val) {
         var zoomIn = val < 0;
-        var scaleSt = element.scaleStep + val * 3;
-        // adjust hour scale to desired factors of 24
-        scaleSt = { 4: 3, 5: 6, 9: 8, 11: 12 }[scaleSt] || (scaleSt < 1 ? 1 : scaleSt);
-        var scale = settings.scale;
-        var headerRows = element.headerRows;
-        if (settings.scale === "hours" && scaleSt >= 13) {
-          scale = "days";
-          headerRows = 4;
-          scaleSt = 13;
-        } else if (settings.scale === "days" && zoomIn) {
-          scale = "hours";
-          headerRows = 5;
-          scaleSt = 12;
-        } else if (settings.scale === "days" && !zoomIn) {
-          scale = "weeks";
-          headerRows = 3;
-          scaleSt = 13;
-        } else if (settings.scale === "weeks" && !zoomIn) {
-          scale = "months";
-          headerRows = 2;
-          scaleSt = 14;
-        } else if (settings.scale === "weeks" && zoomIn) {
-          scale = "days";
-          headerRows = 4;
-          scaleSt = 13;
-        } else if (settings.scale === "months" && zoomIn) {
-          scale = "weeks";
-          headerRows = 3;
-          scaleSt = 13;
-        }
 
-        // do nothing if attempting to zoom past max/min
-        if (
-          (zoomIn && scales.indexOf(scale) < scales.indexOf(settings.minScale)) ||
-          (!zoomIn && scales.indexOf(scale) > scales.indexOf(settings.maxScale))
-        ) {
-          core.init(element);
-          return;
-        }
-
-        element.scaleStep = scaleSt;
-        settings.scale = scale;
-        element.headerRows = headerRows;
+        const { headers, nextScale } = getNextZoomScale(settings.scale, zoomIn);
+        if (!nextScale) return console.log("No more zoom levels to navigate to");
+        settings.scale = nextScale;
+        element.headerRows = headers;
 
         // save the new scale to local storage
         if (settings.rememberZoomLevel) {
@@ -1072,7 +1096,7 @@ function main() {
 
       // Move chart via mousewheel
       wheelScroll: function (element, e) {
-        if (!e.shiftKey) return; // only scroll when shift key is pressed
+        if (!element.canScroll || !e.shiftKey) return; // only scroll when shift key is pressed
         e.preventDefault(); // e is a jQuery Event
         const ctrlKey = e.ctrlKey || e.metaKey || e.originalEvent.ctrlKey || e.originalEvent.metaKey;
         // https://developer.mozilla.org/en-US/docs/Web/API/WheelEvent/deltaY
@@ -1080,7 +1104,8 @@ function main() {
         const deltaY = Math.sign(e.deltaY || e.originalEvent.deltaY) || 0;
         let step = ctrlKey ? deltaY * 5 : deltaY * 1; // faster scroll if ctrl(meta) is pressed
 
-        if (settings.scale === "hours") step *= 0.25; // slower scroll for hours
+        if (HOUR_SCALES.includes(settings.scale))
+          step *= 0.25; // slower scroll for hours
 
         const currentProgress = tools.getProgressBarProgress(element);
         const newProgress = currentProgress + step;
@@ -1132,8 +1157,14 @@ function main() {
         var bd;
         switch (settings.scale) {
           case "hours":
-            maxDate.setHours(Math.ceil(maxDate.getHours() / element.scaleStep) * element.scaleStep);
-            maxDate.setHours(maxDate.getHours() + element.scaleStep * 3);
+          case "every hour":
+          case "every 3 hours":
+          case "every 6 hours":
+          case "every 8 hours":
+          case "half days":
+            const step = SCALE_HOUR_STEPS[settings.scale];
+            maxDate.setHours(Math.ceil(maxDate.getHours() / step) * step);
+            maxDate.setHours(maxDate.getHours() + step * 3);
             break;
           case "weeks":
             // wtf is happening here?
@@ -1173,8 +1204,14 @@ function main() {
         minDate = minDate || new Date();
         switch (settings.scale) {
           case "hours":
-            minDate.setHours(Math.floor(minDate.getHours() / element.scaleStep) * element.scaleStep);
-            minDate.setHours(minDate.getHours() - element.scaleStep * 3);
+          case "every hour":
+          case "every 3 hours":
+          case "every 6 hours":
+          case "every 8 hours":
+          case "half days":
+            const step = SCALE_HOUR_STEPS[settings.scale];
+            minDate.setHours(Math.floor(minDate.getHours() / step) * step);
+            minDate.setHours(minDate.getHours() - step * 3);
             break;
           case "weeks":
             minDate.setHours(0, 0, 0, 0);
@@ -1209,17 +1246,17 @@ function main() {
 
       // Return an array of Date objects between `from` and `to`,
       // scaled hourly
-      parseTimeRange: function (from, to, scaleStep) {
+      parseTimeRange: function (from, to, step) {
         var year = from.getFullYear();
         var month = from.getMonth();
         var date = from.getDate();
         var hour = from.getHours();
-        hour -= hour % scaleStep;
+        hour -= hour % step;
         var range = [],
           h = 0,
           i = 0;
         do {
-          range[i] = new Date(year, month, date, hour + h++ * scaleStep);
+          range[i] = new Date(year, month, date, hour + h++ * step);
           // overwrite any hours repeated due to DST changes
           if (i > 0 && range[i].getHours() === range[i - 1].getHours()) {
             i--;
@@ -1275,6 +1312,11 @@ function main() {
         }
         switch (settings.scale) {
           case "hours":
+          case "every hour":
+          case "every 3 hours":
+          case "every 6 hours":
+          case "every 8 hours":
+          case "half days":
             var hour = t.getHours();
             if (arguments.length >= 2) {
               hour = Math.floor(t.getHours() / arguments[1]) * arguments[1];
@@ -1344,6 +1386,7 @@ function main() {
       this.dateStart = null;
       this.dateEnd = null;
       this.headerRows = null;
+      this.originalData = null; // original data before sorting, modifications, etc.
 
       // check if local storage has the zoom level saved
       if (settings.rememberZoomLevel) {
@@ -1355,30 +1398,7 @@ function main() {
         }
       }
 
-      switch (settings.scale) {
-        //case "hours":
-        //    this.headerRows = 5;
-        //    this.scaleStep = 8;
-        //    break;
-        case "hours":
-          this.headerRows = 5;
-          this.scaleStep = 1;
-          break;
-        case "weeks":
-          this.headerRows = 3;
-          this.scaleStep = 13;
-          break;
-        case "months":
-          this.headerRows = 2;
-          this.scaleStep = 14;
-          break;
-        case "days":
-        /* falls through */
-        default:
-          this.headerRows = 4;
-          this.scaleStep = 13;
-      }
-
+      this.headerRows = SCALE_HEADER_COUNT[settings.scale];
       this.canScroll = true;
       this.gantt = null;
       core.create(this);

@@ -4,6 +4,8 @@
     --header-color: #f6f6f6;
     --bar-height: 18px;
     --holiday-bg: #f5f5f5;
+    --holiday-text-color: red;
+    --saturday-color: blue;
     --today-bg: hsl(174, 42%, 80%);
 }
 
@@ -135,6 +137,14 @@
     text-align: center;
 }
 
+.fn-gantt .sa {
+    color: var(--saturday-color);
+}
+
+.fn-gantt .sn {
+    color: var(--holiday-text-color);
+}
+
 .fn-gantt .wd {
     background-color: var(--header-color);
     text-align: center;
@@ -142,7 +152,7 @@
 
 .fn-gantt .holiday {
     background-color: var(--holiday-bg);
-    color: #939496;
+    color: var(--holiday-text-color);
     height: var(--cell-size);
 }
 
@@ -202,7 +212,7 @@
     border: 1px dashed var(--resizer-color);
 }
 
-.fn-gantt .bar[data-resized] {
+.fn-gantt .bar[data-resized='true'] {
     border: 1px dashed var(--resizer-color);
 }
 
@@ -282,10 +292,11 @@
 
 .fn-gantt .navigate {
     border-top: 1px solid #ddd;
-    display: flex;
     align-items: center;
     justify-content: center;
     padding-block: 1rem;
+    display: grid;
+    gap: 0.5rem;
 }
 
 .fn-gantt .navigate .nav-sort-bar-order {
@@ -348,6 +359,18 @@
     top: 0;
     margin: -26px 0 0 0;
     cursor: pointer;
+}
+
+.fn-gantt .navigate .nav-holidays-input {
+    margin-inline: 0.5rem;
+}
+
+.fn-gantt .navigate .nav-holidays-input form {
+    display: flex;
+}
+
+.fn-gantt .navigate .nav-holidays-input div {
+    display: grid;
 }
 
 .fn-gantt .navigate .page-number {
@@ -507,11 +530,17 @@
     border-width: var(--arrow-width);
     border-style: solid;
     border-color: transparent;
+    transform: rotate(45deg);
+
+    top: calc(100% - var(--arrow-width));
+    left: 0%;
+    margin-left: calc(-1 * var(--arrow-width));
+    border-top-color: #ccc;
 }
 
-.gantt-tooltip[data-position='top']::before {
-    top: 100%;
-    left: 50%;
+/* .gantt-tooltip[data-position='top']::before {
+    top: calc(100% - var(--arrow-width));
+    left: 0%;
     margin-left: calc(-1 * var(--arrow-width));
     border-top-color: #ccc;
 }
@@ -536,4 +565,4 @@
     left: 100%;
     margin-top: calc(-1 * var(--arrow-width));
     border-left-color: #ccc;
-}
+} */

@@ -134,28 +134,3 @@ export const initialSettings = {
   onPageSizeChange: async (pageSize, currentPage) => {},
   onBarResize: (bar, data) => {},
 };
-
-/** @type {Scale[]} */
-// export const SCALES = [
-//   "months",
-//   "weeks",
-//   "days",
-//   "half days",
-//   "every 8 hours",
-//   "every 6 hours",
-//   "every 3 hours",
-//   "every hour",
-// ];
-export const SCALES = ["hours", "days", "weeks", "months"];
-
-/** @type {Record<Scale, number>} */
-export const ZOOM_LEVELS = {
-  months: 4,
-  weeks: 3,
-  days: 4,
-  "half days": 5,
-  "every 8 hours": 5,
-  "every 6 hours": 5,
-  "every 3 hours": 5,
-  "every hour": 5,
-};

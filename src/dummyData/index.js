@@ -1,4 +1,4 @@
-// import scheduleData from "./schedule.js";
+import scheduleData from "./schedule.js";
 import randomData from "./random.js";
 import testPlanData from "./testPlans.js";
 
@@ -16,9 +16,9 @@ const getGanttData = async (page = 1, itemsPerPage = 10, data) => {
   };
 };
 
-// export const getScheduleData = async (page = 1, itemsPerPage = 10) => {
-//   return getGanttData(page, itemsPerPage, scheduleData);
-// };
+export const getScheduleData = async (page = 1, itemsPerPage = 10) => {
+  return getGanttData(page, itemsPerPage, scheduleData);
+};
 
 export const getRandomData = async (page = 1, itemsPerPage = 10) => {
   return getGanttData(page, itemsPerPage, randomData);
